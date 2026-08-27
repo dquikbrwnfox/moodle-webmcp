@@ -11,6 +11,8 @@ services:
       mountPath: /var/www/moodledata
       sizeGB: 5
     envVars:
+      - key: PORT
+        value: "8080"
       - key: SITE_URL
         sync: false
       - key: DB_TYPE
