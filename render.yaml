@@ -1,0 +1,14 @@
+services:
+  - type: web
+    name: openlms-webmcp
+    runtime: node
+    plan: starter
+    region: oregon
+    buildCommand: pnpm install && pnpm build
+    startCommand: npx vite preview --host 0.0.0.0 --port $PORT
+    envVars:
+      - key: NODE_VERSION
+        value: 22.14.0
+      - key: PNPM_VERSION
+        value: 10.4.1
+

@@ -1,0 +1,22 @@
+@import "tailwindcss";
+
+@layer base {
+  body {
+    @apply bg-slate-950 text-slate-100 selection:bg-indigo-500/30 selection:text-indigo-200;
+  }
+}
+
+/* Custom glowing pulse for WebMCP Activity */
+@keyframes agent-pulse {
+  0%, 100% {
+    box-shadow: 0 0 15px rgba(99, 102, 241, 0.4), 0 0 30px rgba(56, 189, 248, 0.2);
+  }
+  50% {
+    box-shadow: 0 0 25px rgba(99, 102, 241, 0.8), 0 0 50px rgba(56, 189, 248, 0.5);
+  }
+}
+
+.agent-active-glow {
+  animation: agent-pulse 2s infinite ease-in-out;
+}
+

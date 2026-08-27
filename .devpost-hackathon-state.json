@@ -1,0 +1,47 @@
+{
+  "plugin": "devpost-hackathon",
+  "version": 2,
+  "hackathon": {
+    "slug": "webmcp",
+    "name": "The WebMCP Challenge",
+    "url": "https://webmcp.devpost.com/",
+    "selected": true,
+    "source": "known"
+  },
+  "participant": {
+    "name": "Akash Ramlogan",
+    "display_name": "Akash"
+  },
+  "project": {
+    "name": "OpenLMS WebMCP",
+    "summary": "In-browser WebMCP integration for OpenLMS / Moodle enabling AI agents to co-browse with students, track deadlines, evaluate assignment drafts against grading rubrics, and plan study schedules directly within authenticated LMS sessions.",
+    "ai_usage": "",
+    "codex_usage": ""
+  },
+  "current_stage": "resources",
+  "completed_stages": [
+    "start-hackathon",
+    "review",
+    "resources"
+  ],
+  "rules_acknowledged": true,
+  "learning": {
+    "status": "completed",
+    "current_step": "build",
+    "completed_steps": [
+      "onboard",
+      "scope",
+      "prd",
+      "spec",
+      "checklist",
+      "build"
+    ],
+    "plan_file": "docs/hackathon-build/scope.md",
+    "checklist_file": "docs/hackathon-build/checklist.md"
+  },
+  "submission": {
+    "draft_file": "devpost-submission.md",
+    "status": "not-started"
+  },
+  "next_command": "prepare-submission"
+}
