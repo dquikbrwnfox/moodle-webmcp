@@ -26,5 +26,5 @@ services:
       - key: MOODLE_EMAIL
         value: admin@apex.edu
       - key: MOODLE_SITENAME
-        value: "Moodle WebMCP University"
+        value: Moodle_WebMCP_University
 
