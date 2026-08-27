@@ -1,4 +1,12 @@
+databases:
+  - name: moodle-postgres
+    plan: starter
+    databaseName: moodle
+    user: moodle
+    region: oregon
+
 services:
+  # 1. High-Performance WebMCP Companion Dashboard
   - type: web
     name: openlms-webmcp
     runtime: node
@@ -11,4 +19,49 @@ services:
         value: 22.14.0
       - key: PNPM_VERSION
         value: 10.4.1
+
+  # 2. Real Moodle LMS Server with local_webmcp baked in
+  - type: web
+    name: moodle-server
+    env: docker
+    dockerfilePath: ./moodle/Dockerfile
+    plan: starter
+    region: oregon
+    disk:
+      name: moodledata
+      mountPath: /var/www/moodledata
+      sizeGB: 5
+    envVars:
+      - key: SITE_URL
+        sync: false # Set to https://moodle-server.onrender.com or custom domain in Render
+      - key: DB_TYPE
+        value: pgsql
+      - key: DB_HOST
+        fromDatabase:
+          name: moodle-postgres
+          property: host
+      - key: DB_PORT
+        fromDatabase:
+          name: moodle-postgres
+          property: port
+      - key: DB_NAME
+        fromDatabase:
+          name: moodle-postgres
+          property: database
+      - key: DB_USER
+        fromDatabase:
+          name: moodle-postgres
+          property: user
+      - key: DB_PASS
+        fromDatabase:
+          name: moodle-postgres
+          property: password
+      - key: MOODLE_USERNAME
+        value: admin
+      - key: MOODLE_PASSWORD
+        value: MoodleWebMCP2026!
+      - key: MOODLE_EMAIL
+        value: admin@apex.edu
+      - key: MOODLE_SITENAME
+        value: "OpenLMS WebMCP University"
 
