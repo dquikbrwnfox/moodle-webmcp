@@ -9,7 +9,7 @@ define(['core/ajax', 'core/notification'], function(ajax, notification) {
                 document.modelContext = {
                     registerTool: function(tool) {
                         toolMap.set(tool.name, tool);
-                        console.log('[OpenLMS WebMCP Plugin] Registered in-page tool:', tool.name);
+                        console.log('[Moodle WebMCP Plugin] Registered in-page tool:', tool.name);
                     },
                     unregisterTool: function(name) {
                         toolMap.delete(name);
@@ -20,7 +20,7 @@ define(['core/ajax', 'core/notification'], function(ajax, notification) {
                 };
             }
 
-            // Register standard OpenLMS WebMCP tools
+            // Register standard Moodle WebMCP tools
             document.modelContext.registerTool({
                 name: 'get_enrolled_courses',
                 description: 'Get all courses the logged-in student is currently enrolled in.',
@@ -49,8 +49,10 @@ define(['core/ajax', 'core/notification'], function(ajax, notification) {
                 }
             });
 
-            console.log('[OpenLMS WebMCP] In-Browser Agent Tools Ready (Role: ' + config.userRole + ')');
+            console.log('[Moodle WebMCP] In-Browser Agent Tools Ready (Role: ' + config.userRole + ')');
         }
     };
 });
+
+
 

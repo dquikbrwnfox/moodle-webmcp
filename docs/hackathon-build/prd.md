@@ -1,7 +1,7 @@
-# Product Requirements Document (PRD): OpenLMS WebMCP
+# Product Requirements Document (PRD): Moodle WebMCP
 
 ## Product Summary
-**OpenLMS WebMCP** is an agent-native academic companion for Moodle and OpenLMS. By leveraging the emerging WebMCP standard (`document.modelContext.registerTool`), it turns passive learning management pages into intelligent, interactive workspaces where students, teachers, and browser-based AI agents collaborate directly within the active web session.
+**Moodle WebMCP** is an agent-native academic companion for Moodle and OpenLMS. By leveraging the emerging WebMCP standard (`document.modelContext.registerTool`), it turns passive learning management pages into intelligent, interactive workspaces where students, teachers, and browser-based AI agents collaborate directly within the active web session.
 
 ## Target Users
 
@@ -113,4 +113,6 @@
 - **WebMCP Leverage**: Native `document.modelContext.registerTool` integration running in the user's active browser session with zero backend token setup.
 - **Human + Agent Co-Browsing**: Agent reasoning over complex rubrics and student drafts with visible in-page HUD feedback.
 - **Real-World Utility**: Solves a universal pain point for millions of students and educators navigating legacy LMS software.
+
+
 

@@ -20,7 +20,7 @@ declare global {
   }
   interface Window {
     modelContext?: Document['modelContext'];
-    __OPENLMS_WEBMCP_REGISTERED_TOOLS__?: Map<string, WebMCPToolDefinition>;
+    __MOODLE_WEBMCP_REGISTERED_TOOLS__?: Map<string, WebMCPToolDefinition>;
   }
 }
 
@@ -65,7 +65,7 @@ export class WebMCPRegistry {
     }
 
     if (typeof window !== 'undefined') {
-      window.__OPENLMS_WEBMCP_REGISTERED_TOOLS__ = this.registeredTools;
+      window.__MOODLE_WEBMCP_REGISTERED_TOOLS__ = this.registeredTools;
     }
   }
 
@@ -147,4 +147,6 @@ export class WebMCPRegistry {
 }
 
 export const webmcpRegistry = new WebMCPRegistry();
+
+
 

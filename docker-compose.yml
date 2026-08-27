@@ -29,7 +29,7 @@ services:
       MOODLE_USERNAME: admin
       MOODLE_PASSWORD: MoodleWebMCP2026!
       MOODLE_EMAIL: admin@apex.edu
-      MOODLE_SITENAME: "OpenLMS WebMCP University"
+      MOODLE_SITENAME: "Moodle WebMCP University"
     volumes:
       - moodledata:/var/www/moodledata
     depends_on:
@@ -38,4 +38,6 @@ services:
 volumes:
   postgres_data:
   moodledata:
+
+
 

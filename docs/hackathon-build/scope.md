@@ -1,7 +1,7 @@
-# Project Scope: OpenLMS WebMCP
+# Project Scope: Moodle WebMCP
 
 ## Project Name Candidates
-- **OpenLMS WebMCP** (Selected)
+- **Moodle WebMCP** (Selected)
 - Moodle WebMCP
 - EduMCP: The Agent-Native LMS
 
@@ -45,11 +45,13 @@ University and college students navigating complex course portals (Moodle / Open
 - Agent-native web co-browsing paradigms.
 
 ## Demo Path
-1. Open the deployed **OpenLMS WebMCP** portal in ChatGPT's in-app browser or WebMCP-enabled Chrome.
+1. Open the deployed **Moodle WebMCP** portal in ChatGPT's in-app browser or WebMCP-enabled Chrome.
 2. 1-click launch into the pre-seeded "Apex University" demo with active student persona.
 3. Prompt ChatGPT: *"Give me a briefing on my courses this week, check what assignments are urgent, and analyze my draft essay for CS101 against its rubric."*
 4. Watch the agent call `get_upcoming_deadlines`, pull the detailed CS101 grading rubric, evaluate the text, and trigger the live in-page Activity HUD.
 
 ## Submission Story
 Demonstrating how the emerging WebMCP standard transforms dense, legacy enterprise web software (educational LMSs) into intelligent, agent-collaborative workspaces with zero administrative install friction.
+
+
 

@@ -1,7 +1,7 @@
-# Technical Specification: OpenLMS WebMCP
+# Technical Specification: Moodle WebMCP
 
 ## Overview
-**OpenLMS WebMCP** is an in-browser agent-native academic companion for Moodle and OpenLMS. It registers structured tools directly into the browser's model context via the emerging WebMCP standard (`document.modelContext.registerTool`), enabling browser AI agents (ChatGPT in-app browser, Chrome 149+) to co-browse with students and instructors inside active web sessions without external token configuration or IT admin installation.
+**Moodle WebMCP** is an in-browser agent-native academic companion for Moodle and OpenLMS. It registers structured tools directly into the browser's model context via the emerging WebMCP standard (`document.modelContext.registerTool`), enabling browser AI agents (ChatGPT in-app browser, Chrome 149+) to co-browse with students and instructors inside active web sessions without external token configuration or IT admin installation.
 
 ---
 
@@ -219,4 +219,6 @@ Z:\webmcp\
    - Judge pastes sample query from submission testing notes.
    - Judge observes instant tool discovery, real-time rubric retrieval, and live visual HUD confirmation.
 3. **Moodle Plugin Package**: Include `local_webmcp` zip/directory in repository with installation instructions for real Moodle administrators.
+
+
 

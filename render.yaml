@@ -8,7 +8,7 @@ databases:
 services:
   # 1. High-Performance WebMCP Companion Dashboard
   - type: web
-    name: openlms-webmcp
+    name: moodle-webmcp
     runtime: node
     plan: starter
     region: oregon
@@ -63,5 +63,7 @@ services:
       - key: MOODLE_EMAIL
         value: admin@apex.edu
       - key: MOODLE_SITENAME
-        value: "OpenLMS WebMCP University"
+        value: "Moodle WebMCP University"
+
+
 

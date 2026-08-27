@@ -1,4 +1,4 @@
-# OpenLMS WebMCP Moodle Local Plugin (`local_webmcp`)
+# Moodle WebMCP Moodle Local Plugin (`local_webmcp`)
 
 A lightweight Moodle local plugin that integrates the **WebMCP standard** (`document.modelContext.registerTool`) directly into Moodle 4.x / 5.x and OpenLMS page headers.
 
@@ -13,5 +13,7 @@ A lightweight Moodle local plugin that integrates the **WebMCP standard** (`docu
    cp -r moodle-plugin/local/webmcp /var/www/html/moodle/local/webmcp
    ```
 2. Navigate to **Site Administration > Notifications** to complete the database upgrade.
-3. Verify that the plugin is active under **Site Administration > Plugins > Local plugins > OpenLMS WebMCP Integration**.
+3. Verify that the plugin is active under **Site Administration > Plugins > Local plugins > Moodle WebMCP Integration**.
+
+
 

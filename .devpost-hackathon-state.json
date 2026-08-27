@@ -13,8 +13,8 @@
     "display_name": "Akash"
   },
   "project": {
-    "name": "OpenLMS WebMCP",
-    "summary": "In-browser WebMCP integration for OpenLMS / Moodle enabling AI agents to co-browse with students, track deadlines, evaluate assignment drafts against grading rubrics, and plan study schedules directly within authenticated LMS sessions.",
+    "name": "Moodle WebMCP",
+    "summary": "In-browser WebMCP integration for Moodle enabling AI agents in ChatGPT and Chrome to co-browse with students, track deadlines, evaluate assignment drafts against rubrics, and assist instructors with grading.",
     "ai_usage": "",
     "codex_usage": ""
   },

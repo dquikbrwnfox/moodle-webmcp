@@ -25,7 +25,7 @@ export const Navbar: React.FC<Props> = ({ activePersona, onSelectPersona, active
             </div>
             <div>
               <div className="flex items-center gap-2">
-                <span className="text-sm font-bold text-white tracking-tight">OpenLMS WebMCP</span>
+                <span className="text-sm font-bold text-white tracking-tight">Moodle WebMCP</span>
                 <span className="text-[10px] font-mono px-2 py-0.5 rounded-full bg-emerald-500/10 text-emerald-300 border border-emerald-500/30 flex items-center gap-1 font-semibold">
                   <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
                   WebMCP Active
@@ -83,4 +83,6 @@ export const Navbar: React.FC<Props> = ({ activePersona, onSelectPersona, active
     </header>
   );
 };
+
+
 

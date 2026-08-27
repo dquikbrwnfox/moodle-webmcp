@@ -1,4 +1,4 @@
-# Build Checklist: OpenLMS WebMCP
+# Build Checklist: Moodle WebMCP
 
 ## Build Preferences
 
@@ -59,4 +59,6 @@
   What to build: Run full production build, verify dev server, draft demo instructions, and prepare submission materials for `$prepare-submission`.
   Acceptance: Zero-error production build (`dist/` generated), working local dev configuration, and complete testing notes for hackathon judges.
   Verify: `pnpm build` completed cleanly with 0 errors.
+
+
 
