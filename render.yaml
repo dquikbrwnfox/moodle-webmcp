@@ -1,28 +1,7 @@
-databases:
-  - name: moodle-postgres
-    plan: basic-256mb
-    databaseName: moodle
-    user: moodle
-    region: oregon
-
 services:
-  # 1. High-Performance WebMCP Companion Dashboard
+  # Single Real Moodle LMS Server with local_webmcp baked in + persistent SQLite database
   - type: web
     name: moodle-webmcp
-    runtime: node
-    plan: starter
-    region: oregon
-    buildCommand: pnpm install && pnpm build
-    startCommand: npx vite preview --host 0.0.0.0 --port $PORT
-    envVars:
-      - key: NODE_VERSION
-        value: 22.14.0
-      - key: PNPM_VERSION
-        value: 10.4.1
-
-  # 2. Real Moodle LMS Server with local_webmcp baked in
-  - type: web
-    name: moodle-server
     env: docker
     dockerfilePath: ./moodle/Dockerfile
     plan: starter
@@ -35,27 +14,11 @@ services:
       - key: SITE_URL
         sync: false
       - key: DB_TYPE
-        value: pgsql
-      - key: DB_HOST
-        fromDatabase:
-          name: moodle-postgres
-          property: host
-      - key: DB_PORT
-        fromDatabase:
-          name: moodle-postgres
-          property: port
-      - key: DB_NAME
-        fromDatabase:
-          name: moodle-postgres
-          property: database
-      - key: DB_USER
-        fromDatabase:
-          name: moodle-postgres
-          property: user
-      - key: DB_PASS
-        fromDatabase:
-          name: moodle-postgres
-          property: password
+        value: sqlite3
+      - key: MOODLE_DATABASE_TYPE
+        value: sqlite3
+      - key: DB_SQLITE_PATH
+        value: /var/www/moodledata/sqlite/moodle.sqlite
       - key: MOODLE_USERNAME
         value: admin
       - key: MOODLE_PASSWORD
@@ -64,6 +27,4 @@ services:
         value: admin@apex.edu
       - key: MOODLE_SITENAME
         value: "Moodle WebMCP University"
-
-
 

@@ -1,16 +1,6 @@
 version: '3.8'
 
 services:
-  moodle-db:
-    image: postgres:16-alpine
-    restart: unless-stopped
-    environment:
-      POSTGRES_DB: moodle
-      POSTGRES_USER: moodle
-      POSTGRES_PASSWORD: moodlepassword123
-    volumes:
-      - postgres_data:/var/lib/postgresql/data
-
   moodle:
     build:
       context: .
@@ -20,24 +10,16 @@ services:
       - "8080:8080"
     environment:
       SITE_URL: http://localhost:8080
-      DB_TYPE: pgsql
-      DB_HOST: moodle-db
-      DB_PORT: 5432
-      DB_NAME: moodle
-      DB_USER: moodle
-      DB_PASS: moodlepassword123
+      DB_TYPE: sqlite3
+      MOODLE_DATABASE_TYPE: sqlite3
+      DB_SQLITE_PATH: /var/www/moodledata/sqlite/moodle.sqlite
       MOODLE_USERNAME: admin
       MOODLE_PASSWORD: MoodleWebMCP2026!
       MOODLE_EMAIL: admin@apex.edu
       MOODLE_SITENAME: "Moodle WebMCP University"
     volumes:
       - moodledata:/var/www/moodledata
-    depends_on:
-      - moodle-db
 
 volumes:
-  postgres_data:
   moodledata:
-
-
 
