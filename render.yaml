@@ -1,6 +1,6 @@
 databases:
   - name: moodle-postgres
-    plan: starter
+    plan: basic-256mb
     databaseName: moodle
     user: moodle
     region: oregon
@@ -33,7 +33,7 @@ services:
       sizeGB: 5
     envVars:
       - key: SITE_URL
-        sync: false # Set to https://moodle-server.onrender.com or custom domain in Render
+        sync: false
       - key: DB_TYPE
         value: pgsql
       - key: DB_HOST
