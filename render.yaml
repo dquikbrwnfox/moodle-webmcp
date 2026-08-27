@@ -13,6 +13,8 @@ services:
     envVars:
       - key: PORT
         value: "8080"
+      - key: SSLPROXY
+        value: "true"
       - key: SITE_URL
         sync: false
       - key: DB_TYPE
