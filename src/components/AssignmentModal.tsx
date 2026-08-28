@@ -3,7 +3,7 @@ import { Assignment } from '../types/lms';
 import { RubricTable } from './RubricTable';
 import { evaluateDraftAgainstRubricLogic, RubricEvaluationReport } from '../lib/lms/rubricEvaluator';
 import { eventBus } from '../lib/webmcp/eventBus';
-import { X, Calendar, Award, Sparkles, CheckCircle2, AlertCircle, FileText, Send } from 'lucide-react';
+import { X, Calendar, Award, Sparkles, CheckCircle2, AlertCircle, FileText, Bot } from 'lucide-react';
 
 interface Props {
   assignment: Assignment;
@@ -47,10 +47,18 @@ export const AssignmentModal: React.FC<Props> = ({ assignment, onClose, onUpdate
         args: { assignment_id: assignment.id },
         resultSummary: `Score: ${result.percentageScore}% (${result.totalEstimatedScore}/${result.totalPossiblePoints} pts)`,
         fullResult: result,
-        executionTimeMs: 42
+        executionTimeMs: 38
       });
-    }, 400);
+    }, 350);
   };
+
+  // Map criterion evaluations to level labels for live table highlighting
+  const highlightedLevels: Record<string, string> = {};
+  if (evaluation) {
+    for (const crit of evaluation.criteriaEvaluations) {
+      highlightedLevels[crit.criterionId] = crit.performanceLevel;
+    }
+  }
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm animate-in fade-in duration-200">
@@ -158,7 +166,7 @@ export const AssignmentModal: React.FC<Props> = ({ assignment, onClose, onUpdate
           )}
 
           {activeTab === 'rubric' && assignment.rubric && (
-            <RubricTable rubric={assignment.rubric} />
+            <RubricTable rubric={assignment.rubric} highlightedLevels={highlightedLevels} />
           )}
 
           {activeTab === 'draft' && (
@@ -208,7 +216,7 @@ export const AssignmentModal: React.FC<Props> = ({ assignment, onClose, onUpdate
               <div className="p-5 rounded-2xl bg-gradient-to-br from-indigo-950/60 to-slate-900 border border-indigo-500/30 shadow-lg">
                 <div className="flex items-center justify-between mb-3">
                   <div className="flex items-center gap-2">
-                    <Sparkles className="w-5 h-5 text-cyan-400" />
+                    <Bot className="w-5 h-5 text-cyan-400" />
                     <h3 className="text-base font-bold text-slate-100">WebMCP Rubric Evaluation Summary</h3>
                   </div>
                   <div className="text-right">
@@ -225,39 +233,20 @@ export const AssignmentModal: React.FC<Props> = ({ assignment, onClose, onUpdate
                 </p>
               </div>
 
-              {/* Criteria breakdown */}
-              <div className="space-y-4">
-                <h4 className="text-xs font-bold uppercase tracking-wider text-slate-400">Criteria Breakdown</h4>
-                {evaluation.criteriaEvaluations.map(crit => (
-                  <div key={crit.criterionId} className="bg-slate-950/60 border border-slate-800 rounded-xl p-4 space-y-2">
-                    <div className="flex items-center justify-between">
-                      <h5 className="text-sm font-semibold text-slate-200">{crit.criterionTitle}</h5>
-                      <div className="flex items-center gap-2">
-                        <span className="text-xs px-2 py-0.5 rounded bg-slate-800 text-slate-300 font-medium">
-                          {crit.performanceLevel}
-                        </span>
-                        <span className="text-xs font-mono font-bold text-emerald-400">
-                          {crit.estimatedScore} / {crit.maxPoints} pts
-                        </span>
-                      </div>
-                    </div>
-
-                    {crit.strengths.length > 0 && (
-                      <div className="flex items-start gap-2 text-xs text-emerald-300/90 pt-1">
-                        <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400 shrink-0 mt-0.5" />
-                        <span>{crit.strengths.join(' ')}</span>
-                      </div>
-                    )}
-
-                    {crit.growthAreas.length > 0 && (
-                      <div className="flex items-start gap-2 text-xs text-amber-300/90 pt-1">
-                        <AlertCircle className="w-3.5 h-3.5 text-amber-400 shrink-0 mt-0.5" />
-                        <span>{crit.growthAreas.join(' ')}</span>
-                      </div>
-                    )}
+              {/* Criteria breakdown with highlighted level cards */}
+              {assignment.rubric && (
+                <div>
+                  <div className="flex items-center justify-between mb-3">
+                    <h4 className="text-xs font-bold uppercase tracking-wider text-slate-400">
+                      Visual Rubric Criteria Alignment
+                    </h4>
+                    <span className="text-[11px] text-indigo-400 font-mono">
+                      Matched performance levels highlighted below
+                    </span>
                   </div>
-                ))}
-              </div>
+                  <RubricTable rubric={assignment.rubric} highlightedLevels={highlightedLevels} />
+                </div>
+              )}
 
               {/* Actionable recommendations */}
               {evaluation.actionableRecommendations.length > 0 && (

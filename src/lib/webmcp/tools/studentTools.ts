@@ -4,6 +4,61 @@ import { evaluateDraftAgainstRubricLogic } from '../../lms/rubricEvaluator';
 
 export const studentTools: WebMCPToolDefinition[] = [
   {
+    name: 'get_course_materials',
+    description: 'Retrieve lecture outlines, formula sheets, required readings, and key concepts for a course or specific topic.',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        course_id: {
+          type: 'number',
+          description: 'The course ID to fetch materials for (e.g. 101 for CS 101).'
+        },
+        topic: {
+          type: 'string',
+          description: 'Optional topic query (e.g. "heuristics", "crispr", "industrial revolution").'
+        }
+      },
+      required: ['course_id']
+    },
+    execute: async ({ course_id, topic }: { course_id: number; topic?: string }) => {
+      const course = lmsClient.getCourseById(Number(course_id));
+      if (!course) {
+        throw new Error(`Course ${course_id} not found.`);
+      }
+
+      const materials = [
+        {
+          course_code: course.code,
+          module: 'Module 1: Search & Problem Solving',
+          topic: 'Heuristic Search & A*',
+          summary: 'A* evaluation function f(n) = g(n) + h(n). For optimality, h(n) must be admissible (never overestimate true cost) and consistent.',
+          key_formulas: ['f(n) = g(n) + h(n)', 'h(n) <= c(n, a, n\') + h(n\')'],
+          required_readings: ['Russell & Norvig, Chapter 3.5: Informed Search Strategies']
+        },
+        {
+          course_code: course.code,
+          module: 'Module 2: Agent Protocols & Alignment',
+          topic: 'WebMCP Standard & Prompt Injection Mitigation',
+          summary: 'WebMCP specification details how in-browser DOM scripts expose structured tools to client agents via document.modelContext.registerTool. Separates read autonomy from confirmed write gates.',
+          key_formulas: ['document.modelContext.registerTool({ name, inputSchema, execute })'],
+          required_readings: ['W3C WebML Draft: Web Model Context Protocol (2026)', 'Chrome AI Security Guidelines']
+        }
+      ];
+
+      const filtered = topic
+        ? materials.filter(m => m.topic.toLowerCase().includes(topic.toLowerCase()) || m.summary.toLowerCase().includes(topic.toLowerCase()))
+        : materials;
+
+      return {
+        course_code: course.code,
+        course_name: course.name,
+        materials_count: filtered.length,
+        materials: filtered.length > 0 ? filtered : materials
+      };
+    }
+  },
+
+  {
     name: 'get_enrolled_courses',
     description: 'Retrieve all academic courses the current student is actively enrolled in, including course codes, instructors, department, and completion progress.',
     inputSchema: {
@@ -235,4 +290,6 @@ export const studentTools: WebMCPToolDefinition[] = [
     }
   }
 ];
+
+
 
