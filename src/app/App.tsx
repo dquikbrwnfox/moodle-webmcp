@@ -1,11 +1,11 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useLmsStore } from '../lib/store/useLmsStore';
 import { Navbar } from '../components/Navbar';
-import { CourseCard } from '../components/CourseCard';
+import { CourseGrid } from '../components/CourseGrid';
 import { CourseDetailView } from '../components/CourseDetailView';
 import { AssignmentModal } from '../components/AssignmentModal';
 import { ActivityHUD } from '../components/ActivityHUD';
-import { Sparkles, Calendar, BookOpen, Clock, Award, Shield, CheckCircle2, Bot, ArrowRight } from 'lucide-react';
+import { Sparkles, Calendar, BookOpen, Clock, Award, Bot, ArrowRight, CheckCircle2, MessageSquare, ExternalLink } from 'lucide-react';
 
 export const App: React.FC = () => {
   const {
@@ -22,15 +22,21 @@ export const App: React.FC = () => {
     refreshData
   } = useLmsStore();
 
+  const [deadlineSearch, setDeadlineSearch] = useState('');
+
   const activeCourse = courses.find(c => c.id === selectedCourseId);
   const activeAssignment = assignments.find(a => a.id === selectedAssignmentId);
 
   const upcomingAssignments = assignments
-    .filter(a => new Date(a.dueDate) >= new Date('2026-08-26T00:00:00Z'))
+    .filter(a => {
+      const isUpcoming = new Date(a.dueDate) >= new Date('2026-08-26T00:00:00Z');
+      const matchesSearch = a.title.toLowerCase().includes(deadlineSearch.toLowerCase()) || a.courseCode.toLowerCase().includes(deadlineSearch.toLowerCase());
+      return isUpcoming && matchesSearch;
+    })
     .sort((a, b) => new Date(a.dueDate).getTime() - new Date(b.dueDate).getTime());
 
   return (
-    <div className="min-h-screen bg-slate-950 text-slate-100 flex flex-col antialiased">
+    <div className="min-h-screen bg-slate-950 text-slate-100 flex flex-col antialiased selection:bg-indigo-500/30 selection:text-indigo-200">
       <Navbar
         activePersona={persona}
         onSelectPersona={switchPersona}
@@ -40,7 +46,9 @@ export const App: React.FC = () => {
 
       <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
         {/* Banner: WebMCP Co-browsing Explainer */}
-        <div className="relative overflow-hidden rounded-3xl bg-gradient-to-r from-indigo-950/80 via-slate-900 to-slate-950 border border-indigo-500/30 p-6 sm:p-8 shadow-2xl">
+        <div className="relative overflow-hidden rounded-3xl bg-gradient-to-r from-indigo-950/90 via-slate-900 to-slate-950 border border-indigo-500/30 p-6 sm:p-8 shadow-2xl">
+          <div className="absolute top-0 right-0 -mt-8 -mr-8 w-64 h-64 rounded-full bg-indigo-500/10 blur-3xl pointer-events-none" />
+
           <div className="relative z-10 max-w-3xl space-y-3">
             <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-indigo-500/20 text-indigo-300 text-xs font-mono font-semibold border border-indigo-500/30">
               <Bot className="w-3.5 h-3.5 text-cyan-400" />
@@ -62,6 +70,17 @@ export const App: React.FC = () => {
                 <>This webpage exposes structured WebMCP tools directly to ChatGPT or Chrome agents. Ask your agent in chat to <strong className="text-indigo-300 font-semibold">check your upcoming deadlines</strong> or <strong className="text-cyan-300 font-semibold">evaluate your assignment drafts against the grading rubric</strong>.</>
               )}
             </p>
+
+            {/* Quick action pill links */}
+            <div className="pt-2 flex flex-wrap items-center gap-2 text-xs">
+              <span className="text-slate-400 font-medium">Quick Prompts for ChatGPT / Chrome:</span>
+              <span className="px-2.5 py-1 rounded-lg bg-slate-950/80 border border-slate-800 text-indigo-300 font-mono text-[11px]">
+                "What assignments are due this week?"
+              </span>
+              <span className="px-2.5 py-1 rounded-lg bg-slate-950/80 border border-slate-800 text-cyan-300 font-mono text-[11px]">
+                "Evaluate my CS101 draft against the rubric"
+              </span>
+            </div>
           </div>
         </div>
 
@@ -82,29 +101,27 @@ export const App: React.FC = () => {
                     <BookOpen className="w-5 h-5 text-indigo-400" />
                     <h2 className="text-lg font-bold text-slate-100">Enrolled Courses (Fall 2026)</h2>
                   </div>
-                  <span className="text-xs text-slate-400 font-medium">3 active courses</span>
+                  <span className="text-xs text-slate-400 font-medium">{courses.length} active courses</span>
                 </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                  {courses.map(course => (
-                    <CourseCard
-                      key={course.id}
-                      course={course}
-                      onOpenCourse={id => selectCourse(id)}
-                    />
-                  ))}
-                </div>
+                <CourseGrid courses={courses} onOpenCourse={id => selectCourse(id)} />
               </div>
             )}
 
             {activeTab === 'deadlines' && (
               <div className="space-y-6">
-                <div className="flex items-center justify-between">
+                <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3">
                   <div className="flex items-center gap-2">
                     <Calendar className="w-5 h-5 text-indigo-400" />
                     <h2 className="text-lg font-bold text-slate-100">Upcoming Academic Deadlines</h2>
                   </div>
-                  <span className="text-xs text-slate-400 font-medium">{upcomingAssignments.length} deadlines pending</span>
+                  <input
+                    type="text"
+                    value={deadlineSearch}
+                    onChange={e => setDeadlineSearch(e.target.value)}
+                    placeholder="Filter deadlines by course or title..."
+                    className="px-3.5 py-1.5 bg-slate-900 border border-slate-800 rounded-xl text-xs text-slate-200 placeholder-slate-500 focus:outline-none focus:ring-1 focus:ring-indigo-500"
+                  />
                 </div>
 
                 <div className="space-y-3">
@@ -152,7 +169,7 @@ export const App: React.FC = () => {
               <div className="space-y-6">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-2">
-                    <BookOpen className="w-5 h-5 text-indigo-400" />
+                    <MessageSquare className="w-5 h-5 text-indigo-400" />
                     <h2 className="text-lg font-bold text-slate-100">Course Discussion Forums</h2>
                   </div>
                 </div>
