@@ -2,18 +2,23 @@
 defined('MOODLE_INTERNAL') || die();
 
 /**
- * Injects WebMCP tool registration script into Moodle page layout.
- * Handles standard Moodle navigation extensions, AMD module calls,
- * and direct DOM WebMCP standard (document.modelContext) bootstrapping.
+ * Standard Moodle navigation hook to register in-browser WebMCP tools and ensure demo courses.
+ *
+ * @param global_navigation $navigation
  */
 function local_webmcp_extend_navigation(global_navigation $navigation) {
     global $PAGE, $USER, $CFG;
-    static $done = false;
-    if ($done) {
+
+    static $initialized = false;
+    if ($initialized) {
         return;
     }
-    $done = true;
+    $initialized = true;
 
+    // 1. Ensure demo courses and student enrollments exist in SQLite DB
+    local_webmcp_ensure_demo_courses();
+
+    // 2. Determine active user context
     $isLogged = isloggedin() && !isguestuser();
     $role = $isLogged ? (is_siteadmin() ? 'instructor' : 'student') : 'guest';
     $userId = $isLogged ? $USER->id : 0;
@@ -26,24 +31,22 @@ function local_webmcp_extend_navigation(global_navigation $navigation) {
         'wwwroot' => $CFG->wwwroot
     ];
 
-    // 1. AMD module requirement for standard Moodle JS lifecycle
+    // 3. AMD loader requirement for standard Moodle JS lifecycle
     $PAGE->requires->js_call_amd('local_webmcp/webmcp_init', 'init', [$config]);
 
-    // 2. Synchronous inline DOM registration to guarantee document.modelContext
-    // is ready immediately when ChatGPT in-app browser or Chrome AI agents inspect the page.
+    // 4. Synchronous in-page WebMCP registration for instant agent discovery
     $jsonConfig = json_encode($config);
     $inlineScript = "
     (function() {
-        var config = " . $jsonConfig . ";
+        var cfg = " . $jsonConfig . ";
         if (typeof window === 'undefined' || typeof document === 'undefined') return;
 
-        // Initialize document.modelContext
         if (!document.modelContext) {
             var toolMap = new Map();
             document.modelContext = {
                 registerTool: function(tool) {
                     toolMap.set(tool.name, tool);
-                    console.log('[Moodle WebMCP] Registered tool:', tool.name);
+                    console.log('[Moodle WebMCP] Registered in-browser tool:', tool.name);
                 },
                 unregisterTool: function(name) {
                     toolMap.delete(name);
@@ -54,17 +57,17 @@ function local_webmcp_extend_navigation(global_navigation $navigation) {
             };
         }
         window.modelContext = document.modelContext;
-        if (navigator) navigator.modelContext = document.modelContext;
+        if (typeof navigator !== 'undefined') navigator.modelContext = document.modelContext;
 
-        // Register core LMS tools
+        // Tool 1: get_enrolled_courses
         document.modelContext.registerTool({
             name: 'get_enrolled_courses',
             description: 'Get all active courses the logged-in student or instructor is enrolled in, with course codes, descriptions, and instructors.',
             inputSchema: { type: 'object', properties: {} },
             execute: async function() {
                 return {
-                    user_id: config.userId,
-                    user_role: config.userRole,
+                    user_id: cfg.userId,
+                    user_role: cfg.userRole,
                     source: 'Moodle 4.5 Active Session',
                     courses: [
                         {
@@ -88,6 +91,7 @@ function local_webmcp_extend_navigation(global_navigation $navigation) {
             }
         });
 
+        // Tool 2: get_upcoming_deadlines
         document.modelContext.registerTool({
             name: 'get_upcoming_deadlines',
             description: 'Get all pending assignment and lab deadlines sorted chronologically.',
@@ -127,6 +131,7 @@ function local_webmcp_extend_navigation(global_navigation $navigation) {
             }
         });
 
+        // Tool 3: get_assignment_details
         document.modelContext.registerTool({
             name: 'get_assignment_details',
             description: 'Fetch detailed assignment instructions, submission guidelines, and structured grading rubrics.',
@@ -160,6 +165,7 @@ function local_webmcp_extend_navigation(global_navigation $navigation) {
             }
         });
 
+        // Tool 4: evaluate_draft_against_rubric
         document.modelContext.registerTool({
             name: 'evaluate_draft_against_rubric',
             description: 'Critically analyze a student draft essay or report against the assignment official grading rubric.',
@@ -212,6 +218,7 @@ function local_webmcp_extend_navigation(global_navigation $navigation) {
             }
         });
 
+        // Tool 5: get_course_materials
         document.modelContext.registerTool({
             name: 'get_course_materials',
             description: 'Retrieve lecture outlines, formula sheets, and required reading citations for a course.',
@@ -243,24 +250,164 @@ function local_webmcp_extend_navigation(global_navigation $navigation) {
             }
         });
 
-        console.log('[Moodle WebMCP] In-page WebMCP tools initialized (Role: ' + config.userRole + ')');
+        // Tool 6 & 7: Instructor/Admin Tools
+        if (cfg.userRole === 'instructor' || cfg.userRole === 'admin') {
+            document.modelContext.registerTool({
+                name: 'get_course_submissions_summary',
+                description: 'Get an administrative summary of submission counts and grading backlog for a course.',
+                inputSchema: {
+                    type: 'object',
+                    properties: {
+                        course_id: { type: 'number', description: 'Course ID.' }
+                    },
+                    required: ['course_id']
+                },
+                execute: async function(args) {
+                    return {
+                        course_id: args.course_id,
+                        course_code: 'CS 101',
+                        total_enrolled: 42,
+                        submissions_received: 38,
+                        pending_grading: 6,
+                        completed_graded: 32
+                    };
+                }
+            });
+
+            document.modelContext.registerTool({
+                name: 'generate_rubric_feedback_draft',
+                description: 'Generate structured, criteria-aligned feedback for an unreviewed student submission.',
+                inputSchema: {
+                    type: 'object',
+                    properties: {
+                        submission_id: { type: 'number', description: 'Student submission ID.' }
+                    },
+                    required: ['submission_id']
+                },
+                execute: async function(args) {
+                    return {
+                        submission_id: args.submission_id,
+                        student: 'Alex Rivera',
+                        suggested_grade: 96,
+                        criteria_feedback: [
+                            { criterion: 'Ethical Frameworks (35 pts)', score: 34, note: 'Exceptional contrast of philosophical traditions.' },
+                            { criterion: 'Technical Depth (35 pts)', score: 33, note: 'Clear understanding of client-side browser boundaries.' },
+                            { criterion: 'Governance (20 pts)', score: 19, note: 'Actionable human-in-the-loop confirmation gates.' },
+                            { criterion: 'Clarity & Citations (10 pts)', score: 10, note: 'Excellent academic structure.' }
+                        ],
+                        instructor_summary: 'Exemplary analytical paper. Strong distinction between read queries and destructive writes.'
+                    };
+                }
+            });
+        }
+
+        console.log('[Moodle WebMCP] Active Tools Registered on document.modelContext (Role: ' + cfg.userRole + ')');
     })();
     ";
 
     $PAGE->requires->js_init_code($inlineScript);
 }
 
-function local_webmcp_before_http_headers() {
-    global $PAGE;
-    static $injected = false;
-    if (!$injected && isset($PAGE) && isset($PAGE->requires)) {
-        $injected = true;
-        local_webmcp_extend_navigation(new stdClass());
-    }
-}
+/**
+ * Self-healing seeder: ensures Category, CS 101, AI 202, and student enrollments exist.
+ */
+function local_webmcp_ensure_demo_courses() {
+    global $DB, $CFG;
 
-function local_webmcp_before_footer() {
-    // Retained for backward compatibility
-    return '';
+    // Fast check: if CS101 exists, seeding is already complete
+    if ($DB->record_exists('course', ['shortname' => 'CS101-WEBMCP'])) {
+        return;
+    }
+
+    require_once($CFG->dirroot . '/course/lib.php');
+    require_once($CFG->dirroot . '/lib/enrollib.php');
+    require_once($CFG->dirroot . '/mod/assign/lib.php');
+
+    // 1. Create or get Category
+    $cat = $DB->get_record('course_categories', ['name' => 'Computer Science & AI']);
+    if (!$cat) {
+        $cat = new stdClass();
+        $cat->name = 'Computer Science & AI';
+        $cat->parent = 0;
+        $cat->sortorder = 1;
+        $cat->visible = 1;
+        $cat->id = $DB->insert_record('course_categories', $cat);
+    }
+
+    // 2. Create Courses
+    $createCourse = function($fullname, $shortname, $summary) use ($DB, $cat) {
+        $c = new stdClass();
+        $c->category = $cat->id;
+        $c->fullname = $fullname;
+        $c->shortname = $shortname;
+        $c->summary = $summary;
+        $c->summaryformat = FORMAT_HTML;
+        $c->format = 'topics';
+        $c->numsections = 4;
+        $c->startdate = time() - (14 * 86400);
+        $c->visible = 1;
+        return create_course($c);
+    };
+
+    $cs101 = $createCourse(
+        'CS 101: Agentic Web Development & WebMCP Standards',
+        'CS101-WEBMCP',
+        '<p>Explore emerging in-browser agent standards, tool calling via <code>document.modelContext.registerTool</code>, prompt injection threat models, and human-agent co-browsing architectures.</p>'
+    );
+
+    $ai202 = $createCourse(
+        'AI 202: Advanced Agent Architectures & Tool Security',
+        'AI202-SEC',
+        '<p>Defense-in-depth for client-side AI tools, indirect prompt injection mitigation, sandboxed browser DOMs, and session governance.</p>'
+    );
+
+    // 3. Create CS 101 Assignment with Rubric
+    $assign = new stdClass();
+    $assign->course = $cs101->id;
+    $assign->name = 'Assignment 1: Evaluating Autonomous Agent Boundaries';
+    $assign->intro = '<div class="alert alert-warning"><strong>Deadline:</strong> September 2, 2026 | <strong>Points:</strong> 100</div><h3>Assignment Overview</h3><p>Write a 1,200 to 1,500-word paper evaluating autonomous tool execution by LLMs in web browsers using WebMCP.</p><h4>Grading Criteria</h4><ul><li><strong>Ethical Frameworks (35 pts):</strong> Utilitarianism vs Deontology.</li><li><strong>Technical Depth (35 pts):</strong> document.modelContext architecture and DOM execution.</li><li><strong>Governance (20 pts):</strong> Human-in-the-loop confirmation gates.</li><li><strong>Clarity & Citations (10 pts):</strong> Academic structure.</li></ul>';
+    $assign->introformat = FORMAT_HTML;
+    $assign->alwaysshowdescription = 1;
+    $assign->submissiondrafts = 1;
+    $assign->duedate = time() + (5 * 86400);
+    $assign->allowsubmissionsfromdate = time() - (7 * 86400);
+    $assign->grade = 100;
+    $assign->timemodified = time();
+    $assignId = $DB->insert_record('assign', $assign);
+
+    $mod = $DB->get_record('modules', ['name' => 'assign']);
+    if ($mod) {
+        $cm = new stdClass();
+        $cm->course = $cs101->id;
+        $cm->module = $mod->id;
+        $cm->instance = $assignId;
+        $cm->section = 2;
+        $cm->visible = 1;
+        $cm->visibleold = 1;
+        $cm->added = time();
+        $cmId = $DB->insert_record('course_modules', $cm);
+
+        $section = $DB->get_record('course_sections', ['course' => $cs101->id, 'section' => 2]);
+        if ($section) {
+            $section->sequence = trim($section->sequence . ',' . $cmId, ',');
+            $DB->update_record('course_sections', $section);
+        }
+    }
+
+    // 4. Auto-enroll all non-admin users as Students
+    $studentRole = $DB->get_record('role', ['shortname' => 'student']);
+    $studentRoleId = $studentRole ? $studentRole->id : 5;
+    $manualPlugin = enrol_get_plugin('manual');
+    $users = $DB->get_records_select('user', 'deleted = 0 AND id > 2');
+
+    foreach ([$cs101, $ai202] as $c) {
+        $manualInstance = $DB->get_record('enrol', ['courseid' => $c->id, 'enrol' => 'manual']);
+        if ($manualInstance && $manualPlugin) {
+            foreach ($users as $u) {
+                $manualPlugin->enrol_user($manualInstance, $u->id, $studentRoleId);
+            }
+        }
+        rebuild_course_cache($c->id, true);
+    }
 }
 
