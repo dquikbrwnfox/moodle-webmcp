@@ -401,6 +401,7 @@ function local_webmcp_ensure_demo_courses() {
     require_once($CFG->dirroot . '/course/lib.php');
     require_once($CFG->dirroot . '/lib/enrollib.php');
     require_once($CFG->dirroot . '/mod/assign/lib.php');
+    require_once($CFG->libdir . '/gradelib.php');
 
     // 1. Create or get Category
     $cat = $DB->get_record('course_categories', ['name' => 'Computer Science & AI']);
@@ -507,7 +508,10 @@ function local_webmcp_ensure_demo_courses() {
     // Helper to add Assignment
     $addAssign = function($course, $sectionNum, $name, $intro, $dueDateDays) use ($DB) {
         $existing = $DB->get_record('assign', ['course' => $course->id, 'name' => $name]);
-        if ($existing) return $existing->id;
+        if ($existing) {
+            assign_grade_item_update($existing);
+            return $existing->id;
+        }
 
         $assign = new stdClass();
         $assign->course = $course->id;
@@ -521,6 +525,10 @@ function local_webmcp_ensure_demo_courses() {
         $assign->grade = 100;
         $assign->timemodified = time();
         $assignId = $DB->insert_record('assign', $assign);
+        $assign->id = $assignId;
+
+        // Ensure Moodle gradebook grade item is created for mod_assign
+        assign_grade_item_update($assign);
 
         $mod = $DB->get_record('modules', ['name' => 'assign']);
         if ($mod) {
@@ -607,6 +615,12 @@ function local_webmcp_ensure_demo_courses() {
     $studentRoleId = $studentRole ? $studentRole->id : 5;
     $manualPlugin = enrol_get_plugin('manual');
     $users = $DB->get_records_select('user', 'deleted = 0 AND id > 2');
+
+    // Ensure all existing assignments in database have grade items registered
+    $allAssigns = $DB->get_records('assign');
+    foreach ($allAssigns as $a) {
+        assign_grade_item_update($a);
+    }
 
     foreach ([$cs101, $ai202] as $c) {
         $manualInstance = $DB->get_record('enrol', ['courseid' => $c->id, 'enrol' => 'manual']);
