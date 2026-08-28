@@ -4,4 +4,6 @@ dist
 .npm-cache
 .DS_Store
 *.local
+.env
+.env.*
 
