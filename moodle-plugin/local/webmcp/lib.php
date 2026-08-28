@@ -375,6 +375,19 @@ function local_webmcp_extend_navigation(global_navigation $navigation) {
     $PAGE->requires->js_init_code($inlineScript);
 }
 
+function local_webmcp_before_http_headers() {
+    global $PAGE;
+    static $injected = false;
+    if (!$injected && isset($PAGE) && isset($PAGE->requires)) {
+        $injected = true;
+        local_webmcp_extend_navigation(new stdClass());
+    }
+}
+
+function local_webmcp_before_footer() {
+    return '';
+}
+
 /**
  * Self-healing seeder: ensures Category, CS 101, AI 202, modules, syllabus, and student enrollments exist.
  */
@@ -605,4 +618,3 @@ function local_webmcp_ensure_demo_courses() {
         rebuild_course_cache($c->id, true);
     }
 }
-
