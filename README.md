@@ -54,11 +54,15 @@ To test **Moodle WebMCP** in an AI browser:
 > *"Can you fetch the grading rubric for CS 101 Assignment 1 (Evaluating Autonomous Agent Boundaries) and evaluate my draft essay against each criterion?"*
 - **What happens**: The agent executes `get_assignment_details` to retrieve the multi-tier rubric (Ethical Frameworks, Technical Depth, Governance, Citations) and executes `evaluate_draft_against_rubric` to provide itemized scores and suggestions.
 
-#### 3. Course Materials & Formula Retrieval
+#### 3. Adaptive Milestone Study Planning
+> *"I have 2 hours a day to study. Can you generate an adaptive study schedule for my upcoming CS 101 assignment?"*
+- **What happens**: The agent calls `generate_study_schedule` and returns a day-by-day milestone roadmap (literature review, architecture draft, governance synthesis, and rubric audit).
+
+#### 4. Course Materials & Formula Retrieval
 > *"What are the key concepts and required readings for WebMCP Standards in CS 101?"*
 - **What happens**: The agent calls `get_course_materials` and returns the W3C WebML draft standards and key architecture concepts.
 
-#### 4. Instructor Grading Assistant (Faculty View)
+#### 5. Instructor Grading Assistant (Faculty View)
 > *(Log in as `admin` / Dr. Jane Doe)*  
 > *"Give me a summary of submissions for CS 101, and draft a rubric-aligned feedback review for student John Doe."*
 - **What happens**: The agent invokes `get_course_submissions_summary` and `generate_rubric_feedback_draft`.
@@ -75,6 +79,7 @@ The platform registers role-specific tools into `document.modelContext`:
 - `get_assignment_details(assignment_id: number)`: Complete prompt instructions, due dates, submission status, and structured multi-level rubrics.
 - `evaluate_draft_against_rubric(assignment_id: number, draft_text: string)`: Evaluates draft text against official rubric criteria, returning criteria-by-criteria scores, strengths, and actionable revision suggestions.
 - `get_course_materials(course_id: number, topic?: string)`: Retrieves lecture summaries, formula sheets, and required reading citations.
+- `generate_study_schedule(course_id: number, daily_available_hours: number)`: Computes an adaptive day-by-day milestone roadmap leading up to assignment deadlines.
 
 ### 👩‍🏫 Instructor Tools
 - `get_course_submissions_summary(course_id: number)`: Enrolled student count, submitted count, graded count, and grading completion percentage.
