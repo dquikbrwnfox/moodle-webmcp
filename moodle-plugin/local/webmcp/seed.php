@@ -404,6 +404,216 @@ foreach ($courses as $c) {
 ";
 }
 
+// 4. Set Moodle core additionalhtmlfooter to guarantee in-browser WebMCP tools are available on EVERY page
+$webmcpFooterScript = '<script>
+(function() {
+    if (typeof window === "undefined" || typeof document === "undefined") return;
+    console.log("[Moodle WebMCP] Initializing in-browser WebMCP standard...");
+
+    if (!document.modelContext) {
+        var toolMap = new Map();
+        document.modelContext = {
+            registerTool: function(t) { toolMap.set(t.name, t); console.log("[Moodle WebMCP] Registered tool:", t.name); },
+            unregisterTool: function(n) { toolMap.delete(n); },
+            listTools: function() { return Array.from(toolMap.values()); }
+        };
+    }
+    window.modelContext = document.modelContext;
+    if (typeof navigator !== "undefined") navigator.modelContext = document.modelContext;
+
+    document.modelContext.registerTool({
+        name: "get_enrolled_courses",
+        description: "Get all active courses the logged-in student or instructor is enrolled in, with course codes, descriptions, and instructors.",
+        inputSchema: { type: "object", properties: {} },
+        execute: async function() {
+            return {
+                source: "Moodle 4.5 Active Session",
+                user: window.M?.cfg?.userId || "Active User",
+                courses: [
+                    {
+                        id: 2,
+                        code: "CS 101",
+                        name: "CS 101: Agentic Web Development & WebMCP Standards",
+                        instructor: "Dr. Evelyn Vance",
+                        term: "Fall 2026",
+                        summary: "Explore emerging in-browser agent standards, tool calling via document.modelContext.registerTool, prompt injection threat models, and human-agent co-browsing architectures."
+                    },
+                    {
+                        id: 3,
+                        code: "AI 202",
+                        name: "AI 202: Advanced Agent Architectures & Tool Security",
+                        instructor: "Dr. Evelyn Vance",
+                        term: "Fall 2026",
+                        summary: "Defense-in-depth for client-side AI tools, indirect prompt injection mitigation, sandboxed browser DOMs, and session governance."
+                    }
+                ]
+            };
+        }
+    });
+
+    document.modelContext.registerTool({
+        name: "get_upcoming_deadlines",
+        description: "Get all pending assignment and lab deadlines sorted chronologically.",
+        inputSchema: {
+            type: "object",
+            properties: {
+                days_ahead: { type: "number", description: "Number of days ahead to look for deadlines (default: 14)." }
+            }
+        },
+        execute: async function(args) {
+            var days = args && args.days_ahead ? args.days_ahead : 14;
+            return {
+                query_window_days: days,
+                deadlines: [
+                    {
+                        assignment_id: 101,
+                        course_code: "CS 101",
+                        course_name: "Agentic Web Development",
+                        title: "Assignment 1: Evaluating Autonomous Agent Boundaries",
+                        due_date: "2026-09-02T23:59:00Z",
+                        points_possible: 100,
+                        submission_status: "draft",
+                        has_rubric: true
+                    },
+                    {
+                        assignment_id: 201,
+                        course_code: "AI 202",
+                        course_name: "Advanced Agent Architectures",
+                        title: "Lab 2: Threat Modeling WebMCP Tools",
+                        due_date: "2026-09-05T23:59:00Z",
+                        points_possible: 100,
+                        submission_status: "unsubmitted",
+                        has_rubric: true
+                    }
+                ]
+            };
+        }
+    });
+
+    document.modelContext.registerTool({
+        name: "get_assignment_details",
+        description: "Fetch detailed assignment instructions, submission guidelines, and structured grading rubrics.",
+        inputSchema: {
+            type: "object",
+            properties: {
+                assignment_id: { type: "number", description: "The assignment ID to inspect." }
+            },
+            required: ["assignment_id"]
+        },
+        execute: async function(args) {
+            return {
+                assignment_id: args.assignment_id,
+                course_code: "CS 101",
+                title: "Assignment 1: Evaluating Autonomous Agent Boundaries",
+                description: "Write a 1,200 to 1,500-word critical analysis evaluating autonomous tool execution by LLMs on the web. Compare Utilitarian and Deontological safety approaches, address prompt injection vulnerabilities, and propose a human-in-the-loop governance mechanism.",
+                due_date: "2026-09-02T23:59:00Z",
+                points_possible: 100,
+                rubric: {
+                    id: "rubric-cs101-a1",
+                    title: "CS 101 Assignment 1 Rubric",
+                    total_points: 100,
+                    criteria: [
+                        { id: "crit-ethical-frameworks", title: "Ethical Framework Application", weight_points: 35, description: "Depth and comparative analysis using Utilitarianism vs Deontology." },
+                        { id: "crit-technical-depth", title: "Technical Depth & WebMCP Protocol", weight_points: 35, description: "Factual understanding of tool calling, client-side DOM execution, and prompt injection mitigation." },
+                        { id: "crit-governance", title: "Human-in-the-Loop Governance", weight_points: 20, description: "Practicality and clarity of multi-tier confirmation boundaries." },
+                        { id: "crit-clarity", title: "Clarity, Structure & Citations", weight_points: 10, description: "Prose flow, logical hierarchy, and proper academic citations." }
+                    ]
+                }
+            };
+        }
+    });
+
+    document.modelContext.registerTool({
+        name: "evaluate_draft_against_rubric",
+        description: "Critically analyze a student draft essay or report against the assignment official grading rubric.",
+        inputSchema: {
+            type: "object",
+            properties: {
+                assignment_id: { type: "number", description: "The assignment ID." },
+                draft_text: { type: "string", description: "The student draft text to analyze." }
+            },
+            required: ["assignment_id", "draft_text"]
+        },
+        execute: async function(args) {
+            var text = (args.draft_text || "").toLowerCase();
+            var hasUtilitarian = text.includes("utilitarian");
+            var hasDeontology = text.includes("deontolog");
+            var hasWebmcp = text.includes("webmcp") || text.includes("modelcontext");
+            var hasGovernance = text.includes("human-in-the-loop") || text.includes("confirmation");
+
+            var score = 60;
+            var strengths = [];
+            var suggestions = [];
+
+            if (hasUtilitarian && hasDeontology) {
+                score += 18;
+                strengths.push("Strong contrast between Utilitarian labor efficiency and Deontological duties.");
+            } else {
+                suggestions.push("Explicitly contrast both Utilitarian and Deontological philosophical frameworks.");
+            }
+            if (hasWebmcp) {
+                score += 14;
+                strengths.push("Demonstrates concrete understanding of the in-browser WebMCP protocol.");
+            } else {
+                suggestions.push("Reference the in-browser document.modelContext technical architecture.");
+            }
+            if (hasGovernance) {
+                score += 8;
+                strengths.push("Offers a clear distinction between read-only queries and confirmed write actions.");
+            }
+
+            return {
+                assignment_id: args.assignment_id,
+                total_possible_points: 100,
+                estimated_score: Math.min(100, score),
+                overall_feedback: score >= 90 
+                    ? "Exemplary draft! Thoroughly addresses the core ethical, technical, and governance dimensions." 
+                    : "Solid foundation with clear opportunities to deepen rubric alignment.",
+                strengths: strengths,
+                actionable_suggestions: suggestions
+            };
+        }
+    });
+
+    document.modelContext.registerTool({
+        name: "get_course_materials",
+        description: "Retrieve lecture outlines, formula sheets, and required reading citations for a course.",
+        inputSchema: {
+            type: "object",
+            properties: {
+                course_id: { type: "number", description: "Course ID." },
+                topic: { type: "string", description: "Optional topic search keyword." }
+            },
+            required: ["course_id"]
+        },
+        execute: async function(args) {
+            return {
+                course_id: args.course_id,
+                course_code: "CS 101",
+                materials: [
+                    {
+                        topic: "WebMCP Specification & Architecture",
+                        key_concepts: ["document.modelContext.registerTool", "Zero-token session inheritance", "W3C WebML draft standard"],
+                        required_readings: ["W3C Web Model Context Protocol Draft (2026)", "Chrome AI Security Guidelines"]
+                    },
+                    {
+                        topic: "Heuristic Search & Algorithm Optimization",
+                        key_concepts: ["A* search algorithm", "Admissible heuristics: f(n) = g(n) + h(n)", "State-space pruning"],
+                        required_readings: ["Russell & Norvig, Chapter 3: Informed Search"]
+                    }
+                ]
+            };
+        }
+    });
+
+    console.log("[Moodle WebMCP] Active Tools Registered on document.modelContext");
+})();
+</script>';
+
+set_config('additionalhtmlfooter', $webmcpFooterScript);
+echo "✓ Configured Moodle additionalhtmlfooter for WebMCP standard.
+";
+
 // Purge all Moodle caches so new navigation, JS, and course modules appear immediately
 purge_all_caches();
 echo "✓ Purged all Moodle caches.
