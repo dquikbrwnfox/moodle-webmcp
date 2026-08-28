@@ -8,6 +8,11 @@ defined('MOODLE_INTERNAL') || die();
  */
 function local_webmcp_extend_navigation(global_navigation $navigation) {
     global $PAGE, $USER, $CFG;
+    static $done = false;
+    if ($done) {
+        return;
+    }
+    $done = true;
 
     $isLogged = isloggedin() && !isguestuser();
     $role = $isLogged ? (is_siteadmin() ? 'instructor' : 'student') : 'guest';
@@ -246,7 +251,12 @@ function local_webmcp_extend_navigation(global_navigation $navigation) {
 }
 
 function local_webmcp_before_http_headers() {
-    // Standard Moodle before headers hook
+    global $PAGE;
+    static $injected = false;
+    if (!$injected && isset($PAGE) && isset($PAGE->requires)) {
+        $injected = true;
+        local_webmcp_extend_navigation(new stdClass());
+    }
 }
 
 function local_webmcp_before_footer() {

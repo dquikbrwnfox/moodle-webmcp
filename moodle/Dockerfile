@@ -18,8 +18,15 @@ mkdir -p /var/www/html/local/webmcp\n\
 cp -r /opt/webmcp/* /var/www/html/local/webmcp/\n\
 cp /opt/seed_demo_courses.php /var/www/html/seed_demo_courses.php\n\
 chown -R nobody:nobody /var/www/html/local\n\
-echo "[WebMCP Boot] Running Moodle CLI upgrade and seeder..."\n\
-sleep 2\n\
+for i in $(seq 1 30); do\n\
+    if [ -f /var/www/html/config.php ]; then\n\
+        echo "[WebMCP Boot] Found config.php, proceeding with upgrade and seeding..."\n\
+        break\n\
+    fi\n\
+    echo "[WebMCP Boot] Waiting for config.php..."\n\
+    sleep 2\n\
+done\n\
+sleep 3\n\
 php /var/www/html/admin/cli/upgrade.php --non-interactive || true\n\
 php /var/www/html/seed_demo_courses.php || true\n\
 php /var/www/html/admin/cli/purge_caches.php || true\n\
