@@ -15,7 +15,7 @@ function local_webmcp_extend_navigation(global_navigation $navigation) {
     }
     $initialized = true;
 
-    // 1. Ensure demo courses and student enrollments exist in SQLite DB
+    // 1. Ensure demo courses, sections, page resources, and assignments exist
     local_webmcp_ensure_demo_courses();
 
     // 2. Determine active user context
@@ -309,15 +309,14 @@ function local_webmcp_extend_navigation(global_navigation $navigation) {
 }
 
 /**
- * Self-healing seeder: ensures Category, CS 101, AI 202, and student enrollments exist.
+ * Self-healing seeder: ensures Category, CS 101, AI 202, modules, syllabus, and student enrollments exist.
  */
 function local_webmcp_ensure_demo_courses() {
     global $DB, $CFG;
 
-    // Fast check: if CS101 exists, seeding is already complete
-    if ($DB->record_exists('course', ['shortname' => 'CS101-WEBMCP'])) {
-        return;
-    }
+    // Check if pages already seeded in CS101
+    $cs101 = $DB->get_record('course', ['shortname' => 'CS101-WEBMCP']);
+    $ai202 = $DB->get_record('course', ['shortname' => 'AI202-SEC']);
 
     require_once($CFG->dirroot . '/course/lib.php');
     require_once($CFG->dirroot . '/lib/enrollib.php');
@@ -334,7 +333,7 @@ function local_webmcp_ensure_demo_courses() {
         $cat->id = $DB->insert_record('course_categories', $cat);
     }
 
-    // 2. Create Courses
+    // 2. Create Courses if missing
     $createCourse = function($fullname, $shortname, $summary) use ($DB, $cat) {
         $c = new stdClass();
         $c->category = $cat->id;
@@ -349,52 +348,181 @@ function local_webmcp_ensure_demo_courses() {
         return create_course($c);
     };
 
-    $cs101 = $createCourse(
-        'CS 101: Agentic Web Development & WebMCP Standards',
-        'CS101-WEBMCP',
-        '<p>Explore emerging in-browser agent standards, tool calling via <code>document.modelContext.registerTool</code>, prompt injection threat models, and human-agent co-browsing architectures.</p>'
-    );
-
-    $ai202 = $createCourse(
-        'AI 202: Advanced Agent Architectures & Tool Security',
-        'AI202-SEC',
-        '<p>Defense-in-depth for client-side AI tools, indirect prompt injection mitigation, sandboxed browser DOMs, and session governance.</p>'
-    );
-
-    // 3. Create CS 101 Assignment with Rubric
-    $assign = new stdClass();
-    $assign->course = $cs101->id;
-    $assign->name = 'Assignment 1: Evaluating Autonomous Agent Boundaries';
-    $assign->intro = '<div class="alert alert-warning"><strong>Deadline:</strong> September 2, 2026 | <strong>Points:</strong> 100</div><h3>Assignment Overview</h3><p>Write a 1,200 to 1,500-word paper evaluating autonomous tool execution by LLMs in web browsers using WebMCP.</p><h4>Grading Criteria</h4><ul><li><strong>Ethical Frameworks (35 pts):</strong> Utilitarianism vs Deontology.</li><li><strong>Technical Depth (35 pts):</strong> document.modelContext architecture and DOM execution.</li><li><strong>Governance (20 pts):</strong> Human-in-the-loop confirmation gates.</li><li><strong>Clarity & Citations (10 pts):</strong> Academic structure.</li></ul>';
-    $assign->introformat = FORMAT_HTML;
-    $assign->alwaysshowdescription = 1;
-    $assign->submissiondrafts = 1;
-    $assign->duedate = time() + (5 * 86400);
-    $assign->allowsubmissionsfromdate = time() - (7 * 86400);
-    $assign->grade = 100;
-    $assign->timemodified = time();
-    $assignId = $DB->insert_record('assign', $assign);
-
-    $mod = $DB->get_record('modules', ['name' => 'assign']);
-    if ($mod) {
-        $cm = new stdClass();
-        $cm->course = $cs101->id;
-        $cm->module = $mod->id;
-        $cm->instance = $assignId;
-        $cm->section = 2;
-        $cm->visible = 1;
-        $cm->visibleold = 1;
-        $cm->added = time();
-        $cmId = $DB->insert_record('course_modules', $cm);
-
-        $section = $DB->get_record('course_sections', ['course' => $cs101->id, 'section' => 2]);
-        if ($section) {
-            $section->sequence = trim($section->sequence . ',' . $cmId, ',');
-            $DB->update_record('course_sections', $section);
-        }
+    if (!$cs101) {
+        $cs101 = $createCourse(
+            'CS 101: Agentic Web Development & WebMCP Standards',
+            'CS101-WEBMCP',
+            '<p>Explore emerging in-browser agent standards, tool calling via <code>document.modelContext.registerTool</code>, prompt injection threat models, and human-agent co-browsing architectures.</p>'
+        );
     }
 
-    // 4. Auto-enroll all non-admin users as Students
+    if (!$ai202) {
+        $ai202 = $createCourse(
+            'AI 202: Advanced Agent Architectures & Tool Security',
+            'AI202-SEC',
+            '<p>Defense-in-depth for client-side AI tools, indirect prompt injection mitigation, sandboxed browser DOMs, and session governance.</p>'
+        );
+    }
+
+    // 3. Helper to update section names
+    $setSection = function($courseId, $secNum, $name, $summary) use ($DB) {
+        $sec = $DB->get_record('course_sections', ['course' => $courseId, 'section' => $secNum]);
+        if ($sec) {
+            $sec->name = $name;
+            $sec->summary = $summary;
+            $sec->summaryformat = FORMAT_HTML;
+            $DB->update_record('course_sections', $sec);
+        }
+    };
+
+    $setSection($cs101->id, 0, 'Course Overview & WebMCP Architecture', '<p>Welcome to CS 101! Explore in-browser agent protocols and co-browsing standards.</p>');
+    $setSection($cs101->id, 1, 'Module 1: In-Browser Agent Standards & Tool Declarations', '<p>Foundational principles of client-side tool calling via <code>document.modelContext</code>.</p>');
+    $setSection($cs101->id, 2, 'Module 2: Agent Autonomy, Rubrics & Tool Safety', '<p>Evaluating ethical boundaries, structured assignment rubrics, and automated draft evaluation.</p>');
+    $setSection($cs101->id, 3, 'Module 3: Defense-in-Depth & Client-Side Verification', '<p>Mitigating indirect prompt injections and designing multi-tier human confirmation gates.</p>');
+
+    $setSection($ai202->id, 0, 'Course Overview & Security Protocol', '<p>Welcome to AI 202! Review security policies and laboratory requirements.</p>');
+    $setSection($ai202->id, 1, 'Module 1: STRIDE Threat Modeling for In-Browser Tools', '<p>Analyzing threat surfaces in client-side agent tool calling.</p>');
+    $setSection($ai202->id, 2, 'Module 2: Sandboxing, CSP & Origin Isolation', '<p>Hands-on vulnerability assessments and security boundaries.</p>');
+    $setSection($ai202->id, 3, 'Module 3: Durable Agent Execution & Multi-Agent Systems', '<p>State machines, durable execution, and autonomous workflows.</p>');
+
+    // 4. Helper to add Page module
+    $addPage = function($course, $sectionNum, $name, $content) use ($DB) {
+        $existing = $DB->get_record('page', ['course' => $course->id, 'name' => $name]);
+        if ($existing) return $existing->id;
+
+        $page = new stdClass();
+        $page->course = $course->id;
+        $page->name = $name;
+        $page->intro = '<p>' . htmlspecialchars($name) . '</p>';
+        $page->introformat = FORMAT_HTML;
+        $page->content = $content;
+        $page->contentformat = FORMAT_HTML;
+        $page->legacyfiles = 0;
+        $page->display = 5;
+        $page->revision = 1;
+        $page->timemodified = time();
+        $pageId = $DB->insert_record('page', $page);
+
+        $mod = $DB->get_record('modules', ['name' => 'page']);
+        if ($mod) {
+            $cm = new stdClass();
+            $cm->course = $course->id;
+            $cm->module = $mod->id;
+            $cm->instance = $pageId;
+            $cm->section = $sectionNum;
+            $cm->visible = 1;
+            $cm->visibleold = 1;
+            $cm->added = time();
+            $cmId = $DB->insert_record('course_modules', $cm);
+
+            $sec = $DB->get_record('course_sections', ['course' => $course->id, 'section' => $sectionNum]);
+            if ($sec) {
+                $sec->sequence = trim($sec->sequence . ',' . $cmId, ',');
+                $DB->update_record('course_sections', $sec);
+            }
+        }
+        return $pageId;
+    };
+
+    // Helper to add Assignment
+    $addAssign = function($course, $sectionNum, $name, $intro, $dueDateDays) use ($DB) {
+        $existing = $DB->get_record('assign', ['course' => $course->id, 'name' => $name]);
+        if ($existing) return $existing->id;
+
+        $assign = new stdClass();
+        $assign->course = $course->id;
+        $assign->name = $name;
+        $assign->intro = $intro;
+        $assign->introformat = FORMAT_HTML;
+        $assign->alwaysshowdescription = 1;
+        $assign->submissiondrafts = 1;
+        $assign->duedate = time() + ($dueDateDays * 86400);
+        $assign->allowsubmissionsfromdate = time() - (7 * 86400);
+        $assign->grade = 100;
+        $assign->timemodified = time();
+        $assignId = $DB->insert_record('assign', $assign);
+
+        $mod = $DB->get_record('modules', ['name' => 'assign']);
+        if ($mod) {
+            $cm = new stdClass();
+            $cm->course = $course->id;
+            $cm->module = $mod->id;
+            $cm->instance = $assignId;
+            $cm->section = $sectionNum;
+            $cm->visible = 1;
+            $cm->visibleold = 1;
+            $cm->added = time();
+            $cmId = $DB->insert_record('course_modules', $cm);
+
+            $sec = $DB->get_record('course_sections', ['course' => $course->id, 'section' => $sectionNum]);
+            if ($sec) {
+                $sec->sequence = trim($sec->sequence . ',' . $cmId, ',');
+                $DB->update_record('course_sections', $sec);
+            }
+        }
+        return $assignId;
+    };
+
+    // Add CS 101 Page Resources
+    $addPage($cs101, 0, 'Syllabus & Course Architecture Guide', '
+<div class="alert alert-info">
+    <h4>Welcome to CS 101: Agentic Web Development & WebMCP Standards</h4>
+    <p><strong>Instructor:</strong> Dr. Evelyn Vance | <strong>Term:</strong> Fall 2026</p>
+</div>
+<h3>Course Description</h3>
+<p>This course investigates the next paradigm of human-AI collaboration on the open web: <strong>In-Browser Agent Protocols (WebMCP)</strong>. Learn to declare semantic tools via <code>document.modelContext.registerTool</code>, evaluate student drafts with AI rubrics, and design human-in-the-loop confirmation gates.</p>
+');
+
+    $addPage($cs101, 1, 'Lecture 1: Evolution of In-Browser WebMCP Protocols', '
+<h3>The WebMCP Shift</h3>
+<p>Traditional MCP daemons require server-side installations and manual API tokens. WebMCP allows web applications to declare in-browser tools natively on <code>document.modelContext</code>, inheriting authenticated sessions without token friction.</p>
+');
+
+    $addPage($cs101, 2, 'Lecture 2: Ethical Frameworks for Agent Autonomy', '
+<h3>Utilitarianism vs Deontology in AI Agents</h3>
+<p>Contrast labor-saving automated tool execution (Utilitarian) with duties of user consent and academic integrity (Deontology).</p>
+');
+
+    $addAssign($cs101, 2, 'Assignment 1: Evaluating Autonomous Agent Boundaries', '
+<div class="alert alert-warning"><strong>Deadline:</strong> September 2, 2026 | <strong>Points:</strong> 100</div>
+<h3>Assignment Overview</h3>
+<p>Write a 1,200 to 1,500-word critical analysis evaluating autonomous tool execution by LLMs in web browsers using WebMCP.</p>
+<h4>Grading Criteria</h4>
+<ul>
+    <li><strong>Ethical Frameworks (35 pts):</strong> Utilitarianism vs Deontology.</li>
+    <li><strong>Technical Depth (35 pts):</strong> document.modelContext architecture and DOM execution.</li>
+    <li><strong>Governance (20 pts):</strong> Human-in-the-loop confirmation gates.</li>
+    <li><strong>Clarity & Citations (10 pts):</strong> Academic structure.</li>
+</ul>
+', 5);
+
+    $addPage($cs101, 3, 'Lecture 3: Defense-in-Depth & Prompt Injection Mitigation', '
+<h3>Mitigating Indirect Prompt Injections</h3>
+<p>Explore schema-level validation, DOM sanitization, and native browser confirmation dialogs to prevent unauthorized tool execution.</p>
+');
+
+    // Add AI 202 Page Resources
+    $addPage($ai202, 0, 'Course Syllabus & Security Lab Protocol', '
+<div class="alert alert-info"><h4>AI 202: Advanced Agent Architectures & Tool Security</h4><p>Prerequisite: CS 101 or equivalent.</p></div>
+<p>Hands-on vulnerability assessments and security boundaries for client-side AI agent integrations.</p>
+');
+
+    $addPage($ai202, 1, 'Module 1: STRIDE Threat Modeling for In-Browser Tools', '
+<h3>STRIDE Framework for WebMCP</h3>
+<p>Analyze Spoofing, Tampering, Repudiation, Information Disclosure, Denial of Service, and Elevation of Privilege across DOM-based AI tools.</p>
+');
+
+    $addAssign($ai202, 2, 'Lab 2: Threat Modeling WebMCP Tools', '
+<div class="alert alert-warning"><strong>Deadline:</strong> September 5, 2026 | <strong>Points:</strong> 100</div>
+<p>Conduct an end-to-end STRIDE threat model on a multi-tool WebMCP implementation. Submit a technical audit report (1,000–1,200 words).</p>
+', 8);
+
+    $addPage($ai202, 3, 'Module 3: Durable Agent Execution & Multi-Agent Collaboration', '
+<h3>Durable State Machines</h3>
+<p>Fault-tolerant agent handoffs, durable workflows, and multi-agent coordination patterns.</p>
+');
+
+    // Auto-enroll non-admin users
     $studentRole = $DB->get_record('role', ['shortname' => 'student']);
     $studentRoleId = $studentRole ? $studentRole->id : 5;
     $manualPlugin = enrol_get_plugin('manual');
