@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Moodle WebMCP: In-Browser LMS Copilot
 // @namespace    https://github.com/dquikbrwnfox/moodle-webmcp
-// @version      1.0.0
+// @version      1.1.0
 // @description  Brings the open WebMCP standard (document.modelContext.registerTool) to any Moodle / OpenLMS university portal. Exposes structured tools to ChatGPT in-app browser and Chrome AI agents without server plugins.
 // @author       Akash Ramlogan
 // @match        https://*/*moodle*
@@ -25,7 +25,7 @@
         return;
     }
 
-    console.log('[Moodle WebMCP UserScript] Initializing WebMCP in-page standard on Moodle portal...');
+    console.log('[Moodle WebMCP UserScript] Initializing Imperative WebMCP standard on Moodle portal...');
 
     // Initialize document.modelContext if not natively provided by the browser
     if (!document.modelContext) {
@@ -43,6 +43,8 @@
             }
         };
     }
+    window.modelContext = document.modelContext;
+    if (typeof navigator !== 'undefined') navigator.modelContext = document.modelContext;
 
     // Helper to get active session information
     function getSesskey() {
@@ -53,14 +55,14 @@
         return sessInput ? sessInput.value : '';
     }
 
-    // Register WebMCP Tools into the active DOM
+    // 1. get_enrolled_courses
     document.modelContext.registerTool({
         name: 'get_enrolled_courses',
         description: 'Get all courses the current logged-in user is enrolled in.',
         inputSchema: { type: 'object', properties: {} },
         execute: async function() {
             return {
-                source: 'Moodle Active Session',
+                source: 'Moodle Active Session (UserScript Client)',
                 user: window.M?.cfg?.userId || 'Active User',
                 url: window.location.href,
                 sesskey_present: !!getSesskey(),
@@ -72,6 +74,7 @@
         }
     });
 
+    // 2. get_upcoming_deadlines
     document.modelContext.registerTool({
         name: 'get_upcoming_deadlines',
         description: 'Get pending assignment and quiz deadlines across enrolled courses.',
@@ -88,17 +91,28 @@
                 deadlines: [
                     {
                         assignment_id: 101,
+                        course_id: 2,
                         course_code: 'CS 101',
                         title: 'Assignment 1: Evaluating Autonomous Agent Boundaries',
                         due_date: '2026-09-02T23:59:00Z',
                         points_possible: 100,
                         submission_status: 'draft'
+                    },
+                    {
+                        assignment_id: 201,
+                        course_id: 3,
+                        course_code: 'AI 202',
+                        title: 'Lab 2: Threat Modeling WebMCP Tools',
+                        due_date: '2026-09-05T23:59:00Z',
+                        points_possible: 100,
+                        submission_status: 'unsubmitted'
                     }
                 ]
             };
         }
     });
 
+    // 3. get_assignment_details (DOM-Aware)
     document.modelContext.registerTool({
         name: 'get_assignment_details',
         description: 'Fetch assignment instructions, due date, and grading rubric from the active page.',
@@ -109,16 +123,17 @@
             }
         },
         execute: async function(args) {
-            var pageTitle = document.querySelector('h1, h2')?.textContent?.trim() || 'Assignment 1: Evaluating Autonomous Agent Boundaries';
-            var pageContent = document.querySelector('#region-main, .submissionstatustable')?.textContent?.trim() || '';
+            var pageTitle = document.querySelector('.activity-header h1, h2, #page-header h1')?.textContent?.trim() || 'Assignment 1: Evaluating Autonomous Agent Boundaries';
+            var pageContent = document.querySelector('#intro, #region-main, .submissionstatustable')?.textContent?.trim() || '';
             return {
                 assignment_id: args ? args.assignment_id : 101,
                 title: pageTitle,
-                page_text_preview: pageContent.slice(0, 500)
+                page_text_preview: pageContent.slice(0, 800)
             };
         }
     });
 
+    // 4. evaluate_draft_against_rubric
     document.modelContext.registerTool({
         name: 'evaluate_draft_against_rubric',
         description: 'Analyze a student draft essay against assignment grading rubrics.',
@@ -134,12 +149,13 @@
             return {
                 assignment_id: args.assignment_id,
                 total_possible_points: 100,
-                estimated_score: 94,
+                estimated_score: 96,
                 feedback: 'Exceptional draft! Strong synthesis of philosophical frameworks and WebMCP client execution boundaries.'
             };
         }
     });
 
+    // 5. get_course_materials
     document.modelContext.registerTool({
         name: 'get_course_materials',
         description: 'Retrieve lecture outlines, formula sheets, and required reading citations for a course.',
@@ -166,6 +182,34 @@
         }
     });
 
-    console.log('[Moodle WebMCP UserScript] WebMCP tools successfully registered in active tab.');
+    // 6. generate_study_schedule
+    document.modelContext.registerTool({
+        name: 'generate_study_schedule',
+        description: 'Generate an adaptive day-by-day study roadmap for an upcoming assignment deadline based on available study hours.',
+        inputSchema: {
+            type: 'object',
+            properties: {
+                course_id: { type: 'number', description: 'Course ID (default: 2).' },
+                daily_available_hours: { type: 'number', description: 'Hours student can dedicate per day (default: 2).' }
+            }
+        },
+        execute: async function(args) {
+            var hours = args && args.daily_available_hours ? args.daily_available_hours : 2;
+            return {
+                course_code: 'CS 101',
+                assignment_target: 'Assignment 1: Evaluating Autonomous Agent Boundaries',
+                target_deadline: '2026-09-02T23:59:00Z',
+                daily_budget_hours: hours,
+                schedule: [
+                    { day: 'Day 1: Literature Synthesis', duration_minutes: hours * 60, milestone: 'Annotated outline with 3 ethical arguments' },
+                    { day: 'Day 2: Technical Architecture', duration_minutes: hours * 60, milestone: 'Technical section draft (400 words)' },
+                    { day: 'Day 3: Governance & Drafting', duration_minutes: hours * 60, milestone: 'Complete initial draft (1,200 words)' },
+                    { day: 'Day 4: Rubric Polish & Submit', duration_minutes: hours * 30, milestone: 'Final submission-ready review' }
+                ]
+            };
+        }
+    });
+
+    console.log('[Moodle WebMCP UserScript] All 6 Client WebMCP tools successfully registered.');
 })();
 

@@ -46,7 +46,7 @@ function local_webmcp_extend_navigation(global_navigation $navigation) {
             document.modelContext = {
                 registerTool: function(tool) {
                     toolMap.set(tool.name, tool);
-                    console.log('[Moodle WebMCP] Registered in-browser tool:', tool.name);
+                    console.log('[Moodle WebMCP] Registered tool:', tool.name);
                 },
                 unregisterTool: function(name) {
                     toolMap.delete(name);
@@ -59,7 +59,7 @@ function local_webmcp_extend_navigation(global_navigation $navigation) {
         window.modelContext = document.modelContext;
         if (typeof navigator !== 'undefined') navigator.modelContext = document.modelContext;
 
-        // Tool 1: get_enrolled_courses
+        // 1. get_enrolled_courses
         document.modelContext.registerTool({
             name: 'get_enrolled_courses',
             description: 'Get all active courses the logged-in student or instructor is enrolled in, with course codes, descriptions, and instructors.',
@@ -68,7 +68,7 @@ function local_webmcp_extend_navigation(global_navigation $navigation) {
                 return {
                     user_id: cfg.userId,
                     user_role: cfg.userRole,
-                    source: 'Moodle 4.5 Active Session',
+                    source: 'Moodle 4.5/5.x Active Session',
                     courses: [
                         {
                             id: 2,
@@ -91,7 +91,7 @@ function local_webmcp_extend_navigation(global_navigation $navigation) {
             }
         });
 
-        // Tool 2: get_upcoming_deadlines
+        // 2. get_upcoming_deadlines
         document.modelContext.registerTool({
             name: 'get_upcoming_deadlines',
             description: 'Get all pending assignment and lab deadlines sorted chronologically.',
@@ -108,8 +108,9 @@ function local_webmcp_extend_navigation(global_navigation $navigation) {
                     deadlines: [
                         {
                             assignment_id: 101,
+                            course_id: 2,
                             course_code: 'CS 101',
-                            course_name: 'Agentic Web Development',
+                            course_name: 'Agentic Web Development & WebMCP Standards',
                             title: 'Assignment 1: Evaluating Autonomous Agent Boundaries',
                             due_date: '2026-09-02T23:59:00Z',
                             points_possible: 100,
@@ -118,8 +119,9 @@ function local_webmcp_extend_navigation(global_navigation $navigation) {
                         },
                         {
                             assignment_id: 201,
+                            course_id: 3,
                             course_code: 'AI 202',
-                            course_name: 'Advanced Agent Architectures',
+                            course_name: 'Advanced Agent Architectures & Tool Security',
                             title: 'Lab 2: Threat Modeling WebMCP Tools',
                             due_date: '2026-09-05T23:59:00Z',
                             points_possible: 100,
@@ -131,10 +133,10 @@ function local_webmcp_extend_navigation(global_navigation $navigation) {
             }
         });
 
-        // Tool 3: get_assignment_details
+        // 3. get_assignment_details (DOM-Aware Hybrid)
         document.modelContext.registerTool({
             name: 'get_assignment_details',
-            description: 'Fetch detailed assignment instructions, submission guidelines, and structured grading rubrics.',
+            description: 'Fetch detailed assignment instructions, submission guidelines, and structured grading rubrics (extracts live page DOM if viewing an assignment).',
             inputSchema: {
                 type: 'object',
                 properties: {
@@ -143,13 +145,19 @@ function local_webmcp_extend_navigation(global_navigation $navigation) {
                 required: ['assignment_id']
             },
             execute: async function(args) {
+                var liveTitle = document.querySelector('.activity-header h1, h2, .main-content h2')?.textContent?.trim();
+                var liveIntro = document.querySelector('#intro, .box.generalbox, .submissionstatustable')?.textContent?.trim();
+
+                var isAssignmentPage = window.location.href.includes('mod/assign') || (liveTitle && liveTitle.toLowerCase().includes('assignment'));
+
                 return {
-                    assignment_id: args.assignment_id,
+                    assignment_id: args.assignment_id || 101,
                     course_code: 'CS 101',
-                    title: 'Assignment 1: Evaluating Autonomous Agent Boundaries',
-                    description: 'Write a 1,200 to 1,500-word critical analysis evaluating autonomous tool execution by LLMs on the web. Compare Utilitarian and Deontological safety approaches, address prompt injection vulnerabilities, and propose a human-in-the-loop governance mechanism.',
+                    title: (isAssignmentPage && liveTitle) ? liveTitle : 'Assignment 1: Evaluating Autonomous Agent Boundaries',
+                    description: (isAssignmentPage && liveIntro) ? liveIntro : 'Write a 1,200 to 1,500-word critical analysis evaluating autonomous tool execution by LLMs on the web. Compare Utilitarian and Deontological safety approaches, address prompt injection vulnerabilities, and propose a human-in-the-loop governance mechanism.',
                     due_date: '2026-09-02T23:59:00Z',
                     points_possible: 100,
+                    dom_extracted: isAssignmentPage,
                     rubric: {
                         id: 'rubric-cs101-a1',
                         title: 'CS 101 Assignment 1 Rubric',
@@ -165,7 +173,7 @@ function local_webmcp_extend_navigation(global_navigation $navigation) {
             }
         });
 
-        // Tool 4: evaluate_draft_against_rubric
+        // 4. evaluate_draft_against_rubric
         document.modelContext.registerTool({
             name: 'evaluate_draft_against_rubric',
             description: 'Critically analyze a student draft essay or report against the assignment official grading rubric.',
@@ -218,7 +226,7 @@ function local_webmcp_extend_navigation(global_navigation $navigation) {
             }
         });
 
-        // Tool 5: get_course_materials
+        // 5. get_course_materials (DOM-Aware Hybrid)
         document.modelContext.registerTool({
             name: 'get_course_materials',
             description: 'Retrieve lecture outlines, formula sheets, and required reading citations for a course.',
@@ -231,9 +239,12 @@ function local_webmcp_extend_navigation(global_navigation $navigation) {
                 required: ['course_id']
             },
             execute: async function(args) {
+                var domActivities = Array.from(document.querySelectorAll('.course-content .activityname, .activity-item .instancename')).map(el => el.textContent.trim());
+
                 return {
-                    course_id: args.course_id,
-                    course_code: 'CS 101',
+                    course_id: args.course_id || 2,
+                    course_code: args.course_id === 3 ? 'AI 202' : 'CS 101',
+                    live_page_activities: domActivities.length > 0 ? domActivities : undefined,
                     materials: [
                         {
                             topic: 'WebMCP Specification & Architecture',
@@ -250,7 +261,63 @@ function local_webmcp_extend_navigation(global_navigation $navigation) {
             }
         });
 
-        // Tool 6 & 7: Instructor/Admin Tools
+        // 6. generate_study_schedule (Adaptive Milestone Generator)
+        document.modelContext.registerTool({
+            name: 'generate_study_schedule',
+            description: 'Generate an adaptive day-by-day study roadmap for an upcoming assignment deadline based on available study hours.',
+            inputSchema: {
+                type: 'object',
+                properties: {
+                    course_id: { type: 'number', description: 'Course ID (default: 2 for CS 101).' },
+                    daily_available_hours: { type: 'number', description: 'Hours student can dedicate per day (default: 2).' },
+                    focus_topics: { type: 'array', items: { type: 'string' }, description: 'Optional list of focus topics.' }
+                }
+            },
+            execute: async function(args) {
+                var hours = args && args.daily_available_hours ? args.daily_available_hours : 2;
+                var courseId = args && args.course_id ? args.course_id : 2;
+                var isAi202 = courseId === 3;
+
+                var assignmentName = isAi202 ? 'Lab 2: Threat Modeling WebMCP Tools' : 'Assignment 1: Evaluating Autonomous Agent Boundaries';
+                var deadlineStr = isAi202 ? '2026-09-05T23:59:00Z' : '2026-09-02T23:59:00Z';
+
+                return {
+                    course_code: isAi202 ? 'AI 202' : 'CS 101',
+                    assignment_target: assignmentName,
+                    target_deadline: deadlineStr,
+                    daily_budget_hours: hours,
+                    total_study_blocks: 4,
+                    schedule: [
+                        {
+                            day: 'Day 1: Literature Synthesis',
+                            duration_minutes: hours * 60,
+                            objectives: ['Review Lecture 1 & 2 course materials', 'Contrast philosophical frameworks (Utilitarian vs Deontology)'],
+                            milestone_deliverable: 'Annotated outline with 3 core ethical arguments'
+                        },
+                        {
+                            day: 'Day 2: Technical Architecture & WebMCP Specs',
+                            duration_minutes: hours * 60,
+                            objectives: ['Analyze document.modelContext DOM execution', 'Document zero-token session authentication flow'],
+                            milestone_deliverable: 'Technical architecture comparison draft section (400 words)'
+                        },
+                        {
+                            day: 'Day 3: Governance & First Draft Synthesis',
+                            duration_minutes: hours * 60,
+                            objectives: ['Draft human-in-the-loop multi-tier confirmation boundary', 'Run evaluate_draft_against_rubric on Section 1 & 2'],
+                            milestone_deliverable: 'Complete initial draft (1,200 words)'
+                        },
+                        {
+                            day: 'Day 4: Rubric Polish & Submission',
+                            duration_minutes: hours * 30,
+                            objectives: ['Verify citations and prose flow', 'Final pre-submission audit against 4-tier rubric'],
+                            milestone_deliverable: 'Final submission-ready PDF/text'
+                        }
+                    ]
+                };
+            }
+        });
+
+        // 7 & 8: Instructor/Admin Tools
         if (cfg.userRole === 'instructor' || cfg.userRole === 'admin') {
             document.modelContext.registerTool({
                 name: 'get_course_submissions_summary',
@@ -265,7 +332,7 @@ function local_webmcp_extend_navigation(global_navigation $navigation) {
                 execute: async function(args) {
                     return {
                         course_id: args.course_id,
-                        course_code: 'CS 101',
+                        course_code: args.course_id === 3 ? 'AI 202' : 'CS 101',
                         total_enrolled: 42,
                         submissions_received: 38,
                         pending_grading: 6,
@@ -517,7 +584,7 @@ function local_webmcp_ensure_demo_courses() {
 <p>Conduct an end-to-end STRIDE threat model on a multi-tool WebMCP implementation. Submit a technical audit report (1,000–1,200 words).</p>
 ', 8);
 
-    $addPage($ai202, 3, 'Module 3: Durable Agent Execution & Multi-Agent Collaboration', '
+    $addPage($ai202, 3, 'Module 3: Durable Agent Execution & Multi-Agent Systems', '
 <h3>Durable State Machines</h3>
 <p>Fault-tolerant agent handoffs, durable workflows, and multi-agent coordination patterns.</p>
 ');
