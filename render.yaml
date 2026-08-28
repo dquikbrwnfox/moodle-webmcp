@@ -16,7 +16,7 @@ services:
       - key: SSLPROXY
         value: "true"
       - key: SITE_URL
-        sync: false # Set to https://moodle-webmcp.akashgpt.me or https://moodle-webmcp-9rzc.onrender.com
+        value: "https://moodle-webmcp.onrender.com"
       - key: DB_TYPE
         value: sqlite3
       - key: MOODLE_DATABASE_TYPE
