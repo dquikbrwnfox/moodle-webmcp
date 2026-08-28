@@ -2,16 +2,13 @@ FROM erseco/alpine-moodle:latest
 
 USER root
 
-# Copy our local_webmcp plugin into Moodle's local plugin directory
-COPY moodle-plugin/local/webmcp /var/www/html/local/webmcp
+# Copy plugin and seeder to staging directory (keeps /var/www/html clean for Moodle core initialization)
+COPY moodle-plugin/local/webmcp /opt/webmcp
+COPY moodle/seed_demo_courses.php /opt/seed_demo_courses.php
 
-# Copy course seeder scripts
-COPY moodle/seed_demo_courses.php /var/www/html/moodle/seed_demo_courses.php
-COPY moodle/init_seed.sh /docker-entrypoint-init.d/04-seed-courses.sh
-RUN chmod +x /docker-entrypoint-init.d/04-seed-courses.sh
-
-# Set correct ownership for user nobody (UID 65534) and switch back
-RUN chown -R nobody:nobody /var/www/html /docker-entrypoint-init.d
+# Create startup script in /docker-entrypoint-init.d/ to copy plugin into Moodle at runtime
+RUN printf '#!/bin/sh\nmkdir -p /var/www/html/local/webmcp\ncp -r /opt/webmcp/* /var/www/html/local/webmcp/\nchown -R nobody:nobody /var/www/html/local\n' > /docker-entrypoint-init.d/02-install-webmcp.sh \
+    && chmod +x /docker-entrypoint-init.d/02-install-webmcp.sh
 
 USER nobody
 
