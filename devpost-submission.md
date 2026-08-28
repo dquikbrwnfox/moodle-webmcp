@@ -41,7 +41,7 @@ Higher education is one of the highest-friction enterprise software domains. Bri
 1. Open the live deployment in **ChatGPT's in-app browser** (or **Google Chrome 149+** with `chrome://flags/#enable-webmcp-testing` enabled):
    - **Primary Live URL**: [https://moodle-webmcp.akashgpt.me](https://moodle-webmcp.akashgpt.me) (or [https://moodle-webmcp.onrender.com](https://moodle-webmcp.onrender.com))
 2. Log in with the demo credentials:
-   - **Student Login**: `alex` / `password123`
+   - **Student Login**: `alex` / `MoodleStudent2026!`
    - **Admin / Instructor Login**: `admin` / `MoodleWebMCP2026!`
 3. Prompt ChatGPT:
    - *"What assignments are due across my courses, and can you check if my draft for the CS101 Ethics Essay satisfies the grading rubric?"*
@@ -63,6 +63,8 @@ Higher education is one of the highest-friction enterprise software domains. Bri
 - Live Moodle instance deployed and running with SQLite on Render.
 - Pre-seeded courses and student accounts active.
 - Repository contains complete source code, UserScript, Docker setup, and MIT license.
+
+
 
 
 

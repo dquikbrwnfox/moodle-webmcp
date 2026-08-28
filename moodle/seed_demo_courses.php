@@ -1,7 +1,7 @@
 <?php
 /**
  * Moodle WebMCP Demo Course & Auto-Enrollment Seeder
- * Enrolls all students in all courses by default, enables self-enrollment & guest access.
+ * Enrolls all students in all courses and sets modern password hashes (password_hash).
  */
 
 define('CLI_SCRIPT', true);
@@ -12,8 +12,11 @@ require_once($CFG->dirroot . '/mod/assign/lib.php');
 
 global $DB, $CFG;
 
-echo "=== Running Moodle WebMCP Auto-Enrollment & Course Seeder ===
+echo "=== Running Moodle WebMCP Auto-Enrollment & User Password Reset ===
 ";
+
+$studentPassword = 'MoodleStudent2026!';
+$hashedPassword = password_hash($studentPassword, PASSWORD_DEFAULT);
 
 // 1. Create or Find Category
 $cat = $DB->get_record('course_categories', ['name' => 'Computer Science & AI']);
@@ -27,7 +30,7 @@ if (!$cat) {
 ";
 }
 
-// 2. Helper to create a course with self-enrollment and guest access enabled
+// 2. Setup Courses
 function setup_course($fullname, $shortname, $summary, $catId) {
     global $DB;
     $course = $DB->get_record('course', ['shortname' => $shortname]);
@@ -44,19 +47,17 @@ function setup_course($fullname, $shortname, $summary, $catId) {
         echo "✓ Created Course: {$fullname} ({$shortname})
 ";
     } else {
-        echo "• Course {$shortname} already exists.
+        echo "• Course {$shortname} exists.
 ";
     }
 
-    // Enable self-enrollment for the course
     $selfEnrol = $DB->get_record('enrol', ['courseid' => $course->id, 'enrol' => 'self']);
     if ($selfEnrol) {
-        $selfEnrol->status = 0; // 0 = enabled
-        $selfEnrol->customint6 = 1; // new enrolments allowed
+        $selfEnrol->status = 0;
+        $selfEnrol->customint6 = 1;
         $DB->update_record('enrol', $selfEnrol);
     }
 
-    // Enable guest access
     $guestEnrol = $DB->get_record('enrol', ['courseid' => $course->id, 'enrol' => 'guest']);
     if ($guestEnrol) {
         $guestEnrol->status = 0;
@@ -80,38 +81,48 @@ $ai202 = setup_course(
     $cat->id
 );
 
-// 3. Helper to create users
-function create_demo_user($username, $password, $first, $last, $email) {
+// 3. Create or Update Student Users
+function upsert_student($username, $hashedPassword, $first, $last, $email) {
     global $DB, $CFG;
     $user = $DB->get_record('user', ['username' => $username, 'mnethostid' => $CFG->mnet_localhost_id]);
     if (!$user) {
         $u = new stdClass();
         $u->username = $username;
-        $u->password = hash_internal_user_password($password);
+        $u->password = $hashedPassword;
         $u->firstname = $first;
         $u->lastname = $last;
         $u->email = $email;
         $u->auth = 'manual';
         $u->confirmed = 1;
+        $u->suspended = 0;
+        $u->deleted = 0;
         $u->mnethostid = $CFG->mnet_localhost_id;
         $userId = user_create_user($u);
         echo "✓ Created Student: {$username} ({$first} {$last})
 ";
         return $DB->get_record('user', ['id' => $userId]);
+    } else {
+        // Update password hash to modern bcrypt hash
+        $user->password = $hashedPassword;
+        $user->suspended = 0;
+        $user->deleted = 0;
+        $DB->update_record('user', $user);
+        echo "✓ Updated password hash for {$username}
+";
+        return $user;
     }
-    return $user;
 }
 
-$alex = create_demo_user('alex', 'password123', 'Alex', 'Rivera', 'alex.rivera@apex.edu');
-$student1 = create_demo_user('student1', 'password123', 'Demo', 'Student', 'student1@apex.edu');
-$student2 = create_demo_user('student2', 'password123', 'Jordan', 'Bell', 'jordan.bell@apex.edu');
+$alex = upsert_student('alex', $hashedPassword, 'Alex', 'Rivera', 'alex.rivera@apex.edu');
+$student1 = upsert_student('student1', $hashedPassword, 'Demo', 'Student', 'student1@apex.edu');
+$student2 = upsert_student('student2', $hashedPassword, 'Jordan', 'Bell', 'jordan.bell@apex.edu');
 
-// 4. Enroll ALL students into ALL courses by default
+// 4. Enroll ALL students in ALL courses
 $courses = $DB->get_records('course', null, '', 'id, shortname');
-$users = $DB->get_records_select('user', 'deleted = 0 AND id > 2', null, '', 'id, username'); // exclude guest/admin
+$users = $DB->get_records_select('user', 'deleted = 0 AND id > 2', null, '', 'id, username');
 
 foreach ($courses as $c) {
-    if ($c->id == 1) continue; // skip site course
+    if ($c->id == 1) continue;
 
     $enrol = $DB->get_record('enrol', ['courseid' => $c->id, 'enrol' => 'manual']);
     if (!$enrol) continue;
@@ -128,12 +139,12 @@ foreach ($courses as $c) {
             $ue->timecreated = time();
             $ue->timemodified = time();
             $DB->insert_record('user_enrolments', $ue);
-            echo "✓ Auto-enrolled {$u->username} into {$c->shortname}
+            echo "✓ Enrolled {$u->username} into {$c->shortname}
 ";
         }
     }
 }
 
-echo "=== All Students Successfully Enrolled Across All Courses ===
+echo "=== Seeding & Passwords Reset to 'MoodleStudent2026!' Successfully! ===
 ";
 

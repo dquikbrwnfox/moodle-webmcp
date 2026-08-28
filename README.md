@@ -30,7 +30,7 @@ Existing AI integrations for Moodle rely on traditional backend Model Context Pr
 
 | Resource | URL | Description | Test Credentials |
 |---|---|---|---|
-| **Live Moodle Server** | [https://moodle-webmcp.akashgpt.me](https://moodle-webmcp.akashgpt.me)<br>*(or [https://moodle-webmcp.onrender.com](https://moodle-webmcp.onrender.com))* | Real Moodle 4.5 LMS deployed on Render with `local_webmcp` baked in + persistent SQLite database. | **Admin / Instructor**:<br>User: `admin` / Pass: `MoodleWebMCP2026!`<br><br>**Student Account**:<br>User: `alex` (or `student1`) / Pass: `password123` |
+| **Live Moodle Server** | [https://moodle-webmcp.akashgpt.me](https://moodle-webmcp.akashgpt.me)<br>*(or [https://moodle-webmcp.onrender.com](https://moodle-webmcp.onrender.com))* | Real Moodle 4.5 LMS deployed on Render with `local_webmcp` baked in + persistent SQLite database. | **Admin / Instructor**:<br>User: `admin` / Pass: `MoodleWebMCP2026!`<br><br>**Student Account**:<br>User: `alex` (or `student1`) / Pass: `MoodleStudent2026!` |
 | **GitHub Repository** | [https://github.com/dquikbrwnfox/moodle-webmcp](https://github.com/dquikbrwnfox/moodle-webmcp) | Complete open-source repository (MIT Licensed). | Public Access |
 
 ---
@@ -42,7 +42,7 @@ To test **Moodle WebMCP** in an AI browser:
 ### Step 1: Open Moodle in your AI Browser
 - Open **ChatGPT Desktop** (or **Google Chrome 149+** with `chrome://flags/#enable-webmcp-testing` enabled).
 - In the in-app browser, navigate to [https://moodle-webmcp.akashgpt.me](https://moodle-webmcp.akashgpt.me) (or [https://moodle-webmcp.onrender.com](https://moodle-webmcp.onrender.com)).
-- Log in as student (`alex` / `password123`) or admin (`admin` / `MoodleWebMCP2026!`).
+- Log in as student (`alex` / `MoodleStudent2026!`) or admin (`admin` / `MoodleWebMCP2026!`).
 
 ### Step 2: Test These Example Prompts in Chat
 
@@ -106,13 +106,15 @@ To run the complete Moodle 4.5 + WebMCP stack locally:
 ```bash
 docker compose up -d
 ```
-Open `http://localhost:8080` and log in with `admin` / `MoodleWebMCP2026!` or `alex` / `password123`.
+Open `http://localhost:8080` and log in with `admin` / `MoodleWebMCP2026!` or `alex` / `MoodleStudent2026!`.
 
 ---
 
 ## 📄 License
 
 This project is licensed under the **MIT License** — see the [LICENSE](LICENSE) file for details.
+
+
 
 
 
