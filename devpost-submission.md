@@ -39,7 +39,7 @@ Higher education is one of the highest-friction enterprise software domains. Bri
 
 ## Testing Instructions
 1. Open the live deployment in **ChatGPT's in-app browser** (or **Google Chrome 149+** with `chrome://flags/#enable-webmcp-testing` enabled):
-   - **Primary Live URL**: [https://moodle-webmcp.akashgpt.me](https://moodle-webmcp.akashgpt.me) (or [https://moodle-webmcp-9rzc.onrender.com](https://moodle-webmcp-9rzc.onrender.com))
+   - **Primary Live URL**: [https://moodle-webmcp.akashgpt.me](https://moodle-webmcp.akashgpt.me) (or [https://moodle-webmcp.onrender.com](https://moodle-webmcp.onrender.com))
 2. Log in with the demo credentials:
    - **Student Login**: `alex` / `password123`
    - **Admin / Instructor Login**: `admin` / `MoodleWebMCP2026!`
@@ -48,7 +48,7 @@ Higher education is one of the highest-friction enterprise software domains. Bri
 4. Observe the agent seamlessly call `get_upcoming_deadlines`, pull the rubric via `get_assignment_details`, and execute `evaluate_draft_against_rubric`.
 
 ## Public Demo Link
-- Live Moodle LMS: [https://moodle-webmcp.akashgpt.me](https://moodle-webmcp.akashgpt.me) / [https://moodle-webmcp-9rzc.onrender.com](https://moodle-webmcp-9rzc.onrender.com)
+- Live Moodle LMS: [https://moodle-webmcp.akashgpt.me](https://moodle-webmcp.akashgpt.me) / [https://moodle-webmcp.onrender.com](https://moodle-webmcp.onrender.com)
 
 ## Public Repository Link
 - GitHub Repository: [https://github.com/dquikbrwnfox/moodle-webmcp](https://github.com/dquikbrwnfox/moodle-webmcp) (MIT Licensed)
@@ -63,4 +63,6 @@ Higher education is one of the highest-friction enterprise software domains. Bri
 - Live Moodle instance deployed and running with SQLite on Render.
 - Pre-seeded courses and student accounts active.
 - Repository contains complete source code, UserScript, Docker setup, and MIT license.
+
+
 
