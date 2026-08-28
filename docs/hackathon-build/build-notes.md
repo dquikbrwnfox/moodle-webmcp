@@ -87,3 +87,20 @@
 - Moodle local plugin package (`local_webmcp`) created under `moodle-plugin/local/webmcp/`.
 - Verified production compilation with zero errors.
 
+
+
+## Streamlining Grilling Session
+- Initiated grilling on eliminating the React companion and centering 100% on the Real Moodle plugin + Render deployment + UserScript.
+
+
+
+## Streamlining Grilling Round 1 Decisions
+- Q1: Approved purge of React/Vite companion files.
+- Q2: User feels floating HUD is overkill -> exploring clean native Moodle integration.
+- Q3: Custom domain `moodle-webmcp.akashgpt.me` set up on Render.
+- Q4: Approved real-Moodle positioning; exploring UserScript mechanics in detail.
+
+## Streamlining Grilling Round 2 Frontier
+- HUD resolution: Clean native Moodle vs optional footer toggle.
+- UserScript deep-dive: Session extraction, DOM/AJAX querying, and distribution.
+

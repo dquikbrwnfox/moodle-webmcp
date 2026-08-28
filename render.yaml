@@ -1,5 +1,5 @@
 services:
-  # Single Real Moodle LMS Server with local_webmcp baked in + persistent SQLite database
+  # Moodle WebMCP: Real Moodle LMS with native WebMCP plugin & persistent SQLite storage
   - type: web
     name: moodle-webmcp
     env: docker
@@ -16,7 +16,7 @@ services:
       - key: SSLPROXY
         value: "true"
       - key: SITE_URL
-        sync: false
+        sync: false # Set to https://moodle-webmcp.akashgpt.me or https://moodle-webmcp-9rzc.onrender.com
       - key: DB_TYPE
         value: sqlite3
       - key: MOODLE_DATABASE_TYPE

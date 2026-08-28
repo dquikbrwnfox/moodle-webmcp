@@ -1,14 +1,16 @@
 # Moodle WebMCP UserScript (`moodle-webmcp.user.js`)
 
-Use WebMCP on **any** institutional Moodle / OpenLMS site directly in your browser without requiring university IT administrator permissions!
+Use WebMCP on **any** institutional Moodle or OpenLMS university portal directly in your browser without requiring university IT administrator permissions!
 
 ## How It Works
-- Runs in your browser via [Tampermonkey](https://www.tampermonkey.net/) or [Violentmonkey](https://violentmonkey.github.io/).
-- Automatically executes when you open your university's Moodle portal.
-- Injects `document.modelContext.registerTool` into the page, allowing **ChatGPT's in-app browser** and **Chrome 149+** to co-browse with you inside your active session.
+- Runs client-side in your browser via [Tampermonkey](https://www.tampermonkey.net/) or [Violentmonkey](https://violentmonkey.github.io/).
+- Automatically executes when you open any Moodle site matching standard URL patterns.
+- Uses `@grant none` security sandboxing—it cannot access external networks or exfiltrate credentials; it strictly declares `document.modelContext.registerTool` inside your active Moodle tab.
+- Enables **ChatGPT's in-app browser** and **Google Chrome 149+** to co-browse, inspect syllabi, check deadlines, and evaluate assignment drafts against live course rubrics with zero token configuration.
 
 ## Installation (1-Click)
-1. Install the Tampermonkey or Violentmonkey extension in your browser.
+1. Install [Tampermonkey](https://www.tampermonkey.net/) in your browser.
 2. Click to install [`moodle-webmcp.user.js`](./moodle-webmcp.user.js).
-3. Navigate to your university's Moodle portal—the floating **WebMCP Active** badge will appear in the bottom-right corner!
+3. If your university uses a custom domain (e.g. `https://mycourses.university.edu/*`), add it to the `@match` headers in Tampermonkey.
+4. Navigate to your university Moodle portal—WebMCP tools are now active in the page!
 
