@@ -1,0 +1,4 @@
+shortname,fullname,category_name,summary,format,numsections,enrolment_1,enrolment_1_role
+CS101-WEBMCP,CS 101: Agentic Web Development & WebMCP Standards,Computer Science & AI,"Explore emerging in-browser agent standards, tool calling via document.modelContext.registerTool, prompt injection threat models, and human-agent co-browsing architectures.",topics,4,self,student
+AI202-SEC,AI 202: Advanced Agent Architectures & Tool Security,Computer Science & AI,"Defense-in-depth for client-side AI tools, indirect prompt injection mitigation, sandboxed browser DOMs, and session governance.",topics,4,self,student
+
