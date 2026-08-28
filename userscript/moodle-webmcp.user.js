@@ -140,6 +140,32 @@
         }
     });
 
+    document.modelContext.registerTool({
+        name: 'get_course_materials',
+        description: 'Retrieve lecture outlines, formula sheets, and required reading citations for a course.',
+        inputSchema: {
+            type: 'object',
+            properties: {
+                course_id: { type: 'number', description: 'Course ID' },
+                topic: { type: 'string', description: 'Optional topic search keyword' }
+            },
+            required: ['course_id']
+        },
+        execute: async function(args) {
+            return {
+                course_id: args ? args.course_id : 2,
+                course_code: 'CS 101',
+                materials: [
+                    {
+                        topic: 'WebMCP Specification & Architecture',
+                        key_concepts: ['document.modelContext.registerTool', 'Zero-token session inheritance', 'W3C WebML draft standard'],
+                        required_readings: ['W3C Web Model Context Protocol Draft (2026)', 'Chrome AI Security Guidelines']
+                    }
+                ]
+            };
+        }
+    });
+
     console.log('[Moodle WebMCP UserScript] WebMCP tools successfully registered in active tab.');
 })();
 
