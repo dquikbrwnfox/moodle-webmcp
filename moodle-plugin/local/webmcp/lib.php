@@ -145,7 +145,7 @@ function local_webmcp_extend_navigation(global_navigation $navigation) {
                 required: ['assignment_id']
             },
             execute: async function(args) {
-                var liveTitle = document.querySelector('.activity-header h1, h2, .main-content h2')?.textContent?.trim();
+                var liveTitle = document.querySelector('#page-header h1, .activity-header h1, #page-header h2, .main-content h1')?.textContent?.trim();
                 var liveIntro = document.querySelector('#intro, .box.generalbox, .submissionstatustable')?.textContent?.trim();
 
                 var isAssignmentPage = window.location.href.includes('mod/assign') || (liveTitle && liveTitle.toLowerCase().includes('assignment'));
@@ -632,4 +632,5 @@ function local_webmcp_ensure_demo_courses() {
         rebuild_course_cache($c->id, true);
     }
 }
+
 

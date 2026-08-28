@@ -122,7 +122,7 @@ define(['core/ajax', 'core/notification'], function(ajax, notification) {
                 },
                 execute: async function(args) {
                     // Try DOM extraction first
-                    var liveTitle = document.querySelector('.activity-header h1, h2, .main-content h2')?.textContent?.trim();
+                    var liveTitle = document.querySelector('#page-header h1, .activity-header h1, #page-header h2, .main-content h1')?.textContent?.trim();
                     var liveIntro = document.querySelector('#intro, .box.generalbox, .submissionstatustable')?.textContent?.trim();
                     var liveDue = document.querySelector('.submissionstatustable td:last-child')?.textContent?.trim();
 
@@ -352,5 +352,6 @@ define(['core/ajax', 'core/notification'], function(ajax, notification) {
         }
     };
 });
+
 
 
