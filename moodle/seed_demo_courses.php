@@ -217,7 +217,7 @@ echo "
 add_course_page($cs101, 0, 'Syllabus & Course Architecture Guide', '
 <div class="alert alert-info">
     <h4>Welcome to CS 101: Agentic Web Development & WebMCP Standards</h4>
-    <p><strong>Instructor:</strong> Dr. Evelyn Vance | <strong>Term:</strong> Fall 2026 | <strong>Format:</strong> In-Person & Co-Browsing Lab</p>
+    <p><strong>Instructor:</strong> Dr. Jane Doe | <strong>Term:</strong> Fall 2026 | <strong>Format:</strong> In-Person & Co-Browsing Lab</p>
 </div>
 <h3>Course Description</h3>
 <p>This course investigates the next paradigm of human-AI collaboration on the open web: <strong>In-Browser Agent Protocols (WebMCP)</strong>. As AI assistants evolve from isolated chat sidebars to proactive co-browsers, web platforms must provide structured, secure, and semantic tool interfaces.</p>
@@ -319,7 +319,7 @@ echo "
 add_course_page($ai202, 0, 'Course Syllabus & Security Lab Protocol', '
 <div class="alert alert-info">
     <h4>AI 202: Advanced Agent Architectures & Tool Security</h4>
-    <p><strong>Instructor:</strong> Dr. Evelyn Vance | <strong>Prerequisite:</strong> CS 101 or equivalent</p>
+    <p><strong>Instructor:</strong> Dr. Jane Doe | <strong>Prerequisite:</strong> CS 101 or equivalent</p>
 </div>
 <h3>Overview</h3>
 <p>AI 202 focuses on the security engineering, threat modeling, and runtime sandbox guarantees required to deploy autonomous AI agents on mission-critical web applications.</p>
@@ -434,7 +434,7 @@ $webmcpFooterScript = '<script>
                         id: 2,
                         code: "CS 101",
                         name: "CS 101: Agentic Web Development & WebMCP Standards",
-                        instructor: "Dr. Evelyn Vance",
+                        instructor: "Dr. Jane Doe",
                         term: "Fall 2026",
                         summary: "Explore emerging in-browser agent standards, tool calling via document.modelContext.registerTool, prompt injection threat models, and human-agent co-browsing architectures."
                     },
@@ -442,7 +442,7 @@ $webmcpFooterScript = '<script>
                         id: 3,
                         code: "AI 202",
                         name: "AI 202: Advanced Agent Architectures & Tool Security",
-                        instructor: "Dr. Evelyn Vance",
+                        instructor: "Dr. Jane Doe",
                         term: "Fall 2026",
                         summary: "Defense-in-depth for client-side AI tools, indirect prompt injection mitigation, sandboxed browser DOMs, and session governance."
                     }
@@ -622,4 +622,5 @@ echo "✓ Purged all Moodle caches.
 echo "
 === Database & Content Seeding Completed Successfully! ===
 ";
+
 

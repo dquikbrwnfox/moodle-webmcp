@@ -213,3 +213,4 @@
     console.log('[Moodle WebMCP UserScript] All 6 Client WebMCP tools successfully registered.');
 })();
 
+

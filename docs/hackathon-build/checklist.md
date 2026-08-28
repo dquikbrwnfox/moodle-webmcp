@@ -20,7 +20,7 @@
 
 - [x] **2. LMS Data Models & Apex University Mock Data Engine**
   Spec ref: `spec.md > Components And Responsibilities > 5. Mock LMS Sandbox`
-  What to build: Define TypeScript data interfaces in `src/types/lms.ts` and populate `src/lib/lms/mockData.ts` with rich courses (CS101, BIO200, HIST110), detailed multi-tier rubrics, upcoming deadlines, student submissions, and persona definitions (Alex: Student, Dr. Vance: Instructor).
+  What to build: Define TypeScript data interfaces in `src/types/lms.ts` and populate `src/lib/lms/mockData.ts` with rich courses (CS101, BIO200, HIST110), detailed multi-tier rubrics, upcoming deadlines, student submissions, and persona definitions (John Doe: Student, Dr. Jane Doe: Instructor).
   Acceptance: Complete data coverage for courses, modules, assignments, multi-criteria rubrics, and discussion topics.
   Verify: Data imports and models fully typed and verified.
 
@@ -59,6 +59,7 @@
   What to build: Run full production build, verify dev server, draft demo instructions, and prepare submission materials for `$prepare-submission`.
   Acceptance: Zero-error production build (`dist/` generated), working local dev configuration, and complete testing notes for hackathon judges.
   Verify: `pnpm build` completed cleanly with 0 errors.
+
 
 
 

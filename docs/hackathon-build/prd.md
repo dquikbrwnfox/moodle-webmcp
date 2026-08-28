@@ -24,7 +24,7 @@
 ### Journey 2: Teacher Grading & Feedback Assistant
 1. Instructor switches to or logs in as Course Teacher.
 2. The page detects instructor permissions and registers administrative WebMCP tools.
-3. Teacher asks: *"Give me a status breakdown of Assignment 2 submissions for BIO200 and prepare a draft feedback review for student Alex Rivera based on the lab rubric."*
+3. Teacher asks: *"Give me a status breakdown of Assignment 2 submissions for BIO200 and prepare a draft feedback review for student John Doe based on the lab rubric."*
 4. The agent calls `get_course_submissions_summary` and `generate_rubric_feedback_draft`.
 5. The agent returns a balanced, criteria-aligned feedback draft, and the LMS page visually populates the draft area for instructor review and sign-off.
 
@@ -84,7 +84,7 @@
       - *CS101: Introduction to Artificial Intelligence* (Coding projects, algorithmic rubrics)
       - *BIO200: Molecular & Cellular Biology* (Lab reports, methodology rubrics)
       - *HIST110: Modern World History* (Essay prompts, citation & thesis rubrics)
-    - 1-click toggle between Student ("Alex Rivera") and Instructor ("Dr. Evelyn Vance") personas.
+    - 1-click toggle between Student ("John Doe") and Instructor ("Dr. Jane Doe") personas.
 
 ---
 
@@ -113,6 +113,7 @@
 - **WebMCP Leverage**: Native `document.modelContext.registerTool` integration running in the user's active browser session with zero backend token setup.
 - **Human + Agent Co-Browsing**: Agent reasoning over complex rubrics and student drafts with visible in-page HUD feedback.
 - **Real-World Utility**: Solves a universal pain point for millions of students and educators navigating legacy LMS software.
+
 
 
 

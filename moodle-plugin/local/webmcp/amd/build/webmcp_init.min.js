@@ -50,7 +50,7 @@ define(['core/ajax', 'core/notification'], function(ajax, notification) {
                                 id: 2,
                                 code: 'CS 101',
                                 name: 'CS 101: Agentic Web Development & WebMCP Standards',
-                                instructor: 'Dr. Evelyn Vance',
+                                instructor: 'Dr. Jane Doe',
                                 term: 'Fall 2026',
                                 summary: 'Explore emerging in-browser agent standards, tool calling via document.modelContext.registerTool, prompt injection threat models, and human-agent co-browsing architectures.'
                             },
@@ -58,7 +58,7 @@ define(['core/ajax', 'core/notification'], function(ajax, notification) {
                                 id: 3,
                                 code: 'AI 202',
                                 name: 'AI 202: Advanced Agent Architectures & Tool Security',
-                                instructor: 'Dr. Evelyn Vance',
+                                instructor: 'Dr. Jane Doe',
                                 term: 'Fall 2026',
                                 summary: 'Defense-in-depth for client-side AI tools, indirect prompt injection mitigation, sandboxed browser DOMs, and session governance.'
                             }
@@ -334,7 +334,7 @@ define(['core/ajax', 'core/notification'], function(ajax, notification) {
                     execute: async function(args) {
                         return {
                             submission_id: args.submission_id,
-                            student: 'Alex Rivera',
+                            student: 'John Doe',
                             suggested_grade: 96,
                             criteria_feedback: [
                                 { criterion: 'Ethical Frameworks (35 pts)', score: 34, note: 'Exceptional contrast of philosophical traditions.' },
@@ -352,4 +352,5 @@ define(['core/ajax', 'core/notification'], function(ajax, notification) {
         }
     };
 });
+
 

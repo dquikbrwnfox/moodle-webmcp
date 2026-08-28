@@ -75,7 +75,7 @@ Z:\webmcp\
 │   │   └── index.css              # Tailwind CSS styling
 │   ├── components\
 │   │   ├── Navbar.tsx             # Global navigation + role indicator
-│   │   ├── PersonaSwitcher.tsx    # 1-click switch (Alex: Student / Dr. Vance: Instructor)
+│   │   ├── PersonaSwitcher.tsx    # 1-click switch (John Doe: Student / Dr. Jane Doe: Instructor)
 │   │   ├── CourseGrid.tsx         # Active course dashboard cards
 │   │   ├── CourseDetailView.tsx   # Course modules, syllabus, assignments
 │   │   ├── AssignmentModal.tsx    # Assignment prompt & interactive rubric view
@@ -215,10 +215,11 @@ Z:\webmcp\
 1. **Deploy**: Ship web app to Cloudflare Pages with live URL.
 2. **Judge Experience**:
    - Judge opens URL in ChatGPT in-app browser or Chrome 149+ with WebMCP flag.
-   - Persona is pre-selected as "Alex Rivera (Student)".
+   - Persona is pre-selected as "John Doe (Student)".
    - Judge pastes sample query from submission testing notes.
    - Judge observes instant tool discovery, real-time rubric retrieval, and live visual HUD confirmation.
 3. **Moodle Plugin Package**: Include `local_webmcp` zip/directory in repository with installation instructions for real Moodle administrators.
+
 
 
 

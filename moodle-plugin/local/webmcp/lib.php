@@ -74,7 +74,7 @@ function local_webmcp_extend_navigation(global_navigation $navigation) {
                             id: 2,
                             code: 'CS 101',
                             name: 'CS 101: Agentic Web Development & WebMCP Standards',
-                            instructor: 'Dr. Evelyn Vance',
+                            instructor: 'Dr. Jane Doe',
                             term: 'Fall 2026',
                             summary: 'Explore emerging in-browser agent standards, tool calling via document.modelContext.registerTool, prompt injection threat models, and human-agent co-browsing architectures.'
                         },
@@ -82,7 +82,7 @@ function local_webmcp_extend_navigation(global_navigation $navigation) {
                             id: 3,
                             code: 'AI 202',
                             name: 'AI 202: Advanced Agent Architectures & Tool Security',
-                            instructor: 'Dr. Evelyn Vance',
+                            instructor: 'Dr. Jane Doe',
                             term: 'Fall 2026',
                             summary: 'Defense-in-depth for client-side AI tools, indirect prompt injection mitigation, sandboxed browser DOMs, and session governance.'
                         }
@@ -354,7 +354,7 @@ function local_webmcp_extend_navigation(global_navigation $navigation) {
                 execute: async function(args) {
                     return {
                         submission_id: args.submission_id,
-                        student: 'Alex Rivera',
+                        student: 'John Doe',
                         suggested_grade: 96,
                         criteria_feedback: [
                             { criterion: 'Ethical Frameworks (35 pts)', score: 34, note: 'Exceptional contrast of philosophical traditions.' },
@@ -547,7 +547,7 @@ function local_webmcp_ensure_demo_courses() {
     $addPage($cs101, 0, 'Syllabus & Course Architecture Guide', '
 <div class="alert alert-info">
     <h4>Welcome to CS 101: Agentic Web Development & WebMCP Standards</h4>
-    <p><strong>Instructor:</strong> Dr. Evelyn Vance | <strong>Term:</strong> Fall 2026</p>
+    <p><strong>Instructor:</strong> Dr. Jane Doe | <strong>Term:</strong> Fall 2026</p>
 </div>
 <h3>Course Description</h3>
 <p>This course investigates the next paradigm of human-AI collaboration on the open web: <strong>In-Browser Agent Protocols (WebMCP)</strong>. Learn to declare semantic tools via <code>document.modelContext.registerTool</code>, evaluate student drafts with AI rubrics, and design human-in-the-loop confirmation gates.</p>
@@ -618,3 +618,4 @@ function local_webmcp_ensure_demo_courses() {
         rebuild_course_cache($c->id, true);
     }
 }
+
