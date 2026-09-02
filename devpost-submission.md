@@ -1,19 +1,19 @@
 # Moodle WebMCP
 
 ## One-line Summary
-An open in-browser WebMCP integration for Moodle LMS that turns passive course pages into intelligent, collaborative workspaces where students, teachers, and browser-based AI agents co-browse, evaluate assignment drafts against grading rubrics, plan study milestones, and track deadlines with zero token setup.
+A WebMCP runtime enablement plugin for Moodle LMS that turns passive course pages into intelligent, collaborative workspaces where students, teachers, and browser-based AI agents co-browse, evaluate assignment drafts against grading rubrics, plan study milestones, and track deadlines with zero token setup.
 
 ## Problem
 - **Fragmented LMS Navigation**: In systems like Moodle and OpenLMS, vital academic information—such as assignment rubrics, syllabus deadlines, and unsubmitted draft guidelines—is scattered across nested sub-menus. Students spend excessive time clicking through menus instead of focusing on coursework.
-- **High Administrative Barriers**: Existing AI integrations for Moodle rely on traditional backend Model Context Protocol (MCP) daemons that require either central university IT admin installation of server-side plugins or manual user API token generation with local terminal daemons, which locked-down institutional LMS setups prevent.
+- **High Administrative & Token Barriers**: Existing AI integrations for Moodle rely on traditional backend Model Context Protocol (MCP) daemons that require either central university IT admin installation of server-side microservices or manual user API token generation with local terminal daemons, which locked-down institutional LMS setups prevent.
 
-## Solution: Two Paths, One Open Standard
-**Moodle WebMCP** implements the open WebMCP standard (`document.modelContext.registerTool`) directly inside active Moodle browser sessions, offering two complementary delivery mechanisms:
-1. **Deliverable 1: The Native Moodle Plugin (`local_webmcp`)**: A production-grade Moodle 4.x / 5.x PHP local plugin designed for university IT administrators and educators. It hooks natively into Moodle's navigation lifecycle and RequireJS AMD loaders to automatically enable in-browser WebMCP across all enrolled students and faculty.
-2. **Deliverable 2: The 1-Click UserScript (`moodle-webmcp.user.js`)**: A client-side proof-of-ease / proof-of-concept running under strict `@grant none` sandboxing. It allows everyday students to bring WebMCP to *any* locked-down institutional Moodle portal worldwide in under 15 seconds without requiring IT admin approval.
+## Solution: WebMCP Runtime Plugin for Moodle
+**Moodle WebMCP** (`local_webmcp`) is a standard-compliant local plugin for Moodle 4.x / 5.x and OpenLMS that implements the open WebMCP standard (`document.modelContext.registerTool`) directly inside active course pages. We didn't fork or reinvent Moodle—we integrated WebMCP into Moodle's native navigation and AMD lifecycle.
 
+When students or educators open Moodle in **ChatGPT's in-app browser** or WebMCP-enabled **Chrome (146+)**, the web page immediately registers contextual, role-appropriate tools into the browser's model context:
 - **Zero Token Setup**: Inherits the student's active browser session and CSRF `sesskey` automatically, working with university SSO, Google Workspace, and Microsoft Active Directory.
-- **In-Browser Co-Browsing**: AI agents in **ChatGPT's in-app browser** and **Chrome 146+** query deadlines, retrieve multi-criteria rubrics, evaluate draft essays before submission, generate adaptive study schedules, and summarize lecture materials.
+- **In-Browser Co-Browsing**: AI agents query deadlines, retrieve multi-criteria rubrics, evaluate draft essays before submission, generate adaptive study schedules, and summarize lecture materials directly on the page.
+- **Bonus Proof-of-Concept**: Included a 1-click client-side UserScript (`moodle-webmcp.user.js`) demonstrating how students can bring the identical WebMCP tool contract to third-party university portals in 15 seconds without waiting for IT admin approval.
 
 ## Why This Matters
 Higher education is one of the highest-friction enterprise software domains. Bringing the emerging WebMCP standard to Moodle—the world's most widely used open-source LMS—bridges the gap between passive educational portals and active academic copilots for over 300 million students and educators worldwide.
@@ -33,7 +33,7 @@ Higher education is one of the highest-friction enterprise software domains. Bri
 2. **Interactive Rubric Evaluation**: Instant analysis of unsubmitted essays/reports against official multi-tier rubrics.
 3. **Adaptive Milestone Study Pacing**: Dynamic calculation of study blocks and checkpoints leading up to target assignment deadlines.
 4. **Production Moodle Local Plugin (`local_webmcp`)**: Official Moodle 4.x/5.x PHP plugin and AMD module for server-side institutional deployment.
-5. **1-Click UserScript (`moodle-webmcp.user.js`)**: Client-side Tampermonkey script allowing students to use WebMCP on any university Moodle with `@grant none` security.
+5. **Bonus 1-Click UserScript (`moodle-webmcp.user.js`)**: Client-side Tampermonkey script allowing students to use WebMCP on any university Moodle with `@grant none` security.
 6. **Live Render Deployment**: Full Moodle 5.2.2 LMS with persistent SQLite storage and pre-seeded CS 101 & AI 202 courses.
 
 ## Architecture
@@ -61,7 +61,7 @@ Higher education is one of the highest-friction enterprise software domains. Bri
 ## Demo Video Outline (< 3 Minutes)
 1. **0:00 - 0:40 (Problem & Motivation)**: The pain of navigating fragmented university LMS menus and the barrier of existing backend-token MCPs.
 2. **0:40 - 1:40 (Student Co-Browsing Demo)**: Opening Moodle in ChatGPT, asking for weekly deadlines, generating a study schedule, and having the agent evaluate a draft essay against the CS101 rubric.
-3. **1:40 - 2:20 (Instructor Workflow & Plugin)**: Switching to instructor view, summarizing submissions, and showcasing the `local_webmcp` PHP plugin and 1-Click UserScript proof-of-ease.
+3. **1:40 - 2:20 (Instructor Workflow & Plugin)**: Switching to instructor view, summarizing submissions, and showcasing the `local_webmcp` PHP plugin and 1-Click UserScript proof-of-concept.
 4. **2:20 - 2:50 (Architecture & Conclusion)**: Explaining WebMCP in-page execution and zero-token security.
 
 ## Submission Readiness Notes
