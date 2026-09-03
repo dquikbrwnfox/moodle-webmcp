@@ -6,4 +6,8 @@ dist
 *.local
 .env
 .env.*
+*.cap
+*.cap/
+test_*.mp4
+demo-assets/
 
