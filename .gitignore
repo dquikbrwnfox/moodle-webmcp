@@ -1,3 +1,4 @@
+Good day! 😸
 node_modules
 dist
 .pnpm-store
@@ -11,3 +12,6 @@ dist
 test_*.mp4
 demo-assets/
 
+
+
+.devpost-hackathon-state.json
