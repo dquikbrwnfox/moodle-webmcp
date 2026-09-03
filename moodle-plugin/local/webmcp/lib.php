@@ -53,6 +53,23 @@ function local_webmcp_extend_navigation(global_navigation $navigation) {
                 },
                 listTools: function() {
                     return Array.from(toolMap.values());
+                },
+                // Compatibility helpers used by ChatGPT/Chrome WebMCP bridges.
+                getTools: function() {
+                    return Array.from(toolMap.values()).map(function(tool) {
+                        return { name: tool.name, description: tool.description, inputSchema: tool.inputSchema };
+                    });
+                },
+                executeTool: async function(name, input) {
+                    var tool = toolMap.get(name);
+                    if (!tool || typeof tool.execute !== 'function') {
+                        throw new Error('Unknown WebMCP tool: ' + name);
+                    }
+                    var args = input;
+                    if (typeof input === 'string') {
+                        args = input ? JSON.parse(input) : {};
+                    }
+                    return await tool.execute(args || {});
                 }
             };
         }
